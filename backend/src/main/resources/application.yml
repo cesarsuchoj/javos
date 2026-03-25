@@ -1,0 +1,66 @@
+# ============================================================
+# Javos - Configuração da Aplicação
+# ============================================================
+# Banco de dados padrão: SQLite
+# Para trocar para MySQL, comente o bloco SQLite abaixo e
+# descomente o bloco MySQL. Veja também /docs/README.md.
+# ============================================================
+
+spring:
+  application:
+    name: javos
+
+  # ----------------------------------------------------------
+  # Banco de Dados - SQLite (padrão)
+  # ----------------------------------------------------------
+  datasource:
+    url: jdbc:sqlite:./data/javos.db
+    driver-class-name: org.sqlite.JDBC
+    username:
+    password:
+
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  # ----------------------------------------------------------
+  # Banco de Dados - MySQL (descomente para usar)
+  # ----------------------------------------------------------
+  # datasource:
+  #   url: jdbc:mysql://localhost:3306/javos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  #   driver-class-name: com.mysql.cj.jdbc.Driver
+  #   username: javos_user
+  #   password: javos_password
+  #
+  # jpa:
+  #   database-platform: org.hibernate.dialect.MySQLDialect
+  #   hibernate:
+  #     ddl-auto: update
+  #   show-sql: false
+
+# ----------------------------------------------------------
+# Segurança JWT
+# ----------------------------------------------------------
+javos:
+  jwt:
+    secret: ${JWT_SECRET:javos-default-secret-key-change-in-production-must-be-at-least-256-bits}
+    expiration-ms: 86400000  # 24 horas
+
+# ----------------------------------------------------------
+# Servidor
+# ----------------------------------------------------------
+server:
+  port: ${SERVER_PORT:8080}
+
+# ----------------------------------------------------------
+# Logging
+# ----------------------------------------------------------
+logging:
+  level:
+    com.javos: INFO
+    org.springframework.security: WARN

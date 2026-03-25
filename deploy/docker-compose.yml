@@ -1,0 +1,64 @@
+# ============================================================
+# Javos - Docker Compose
+# ============================================================
+# Executa backend + frontend integrados em um único container.
+# Para usar MySQL em vez de SQLite, descomente o serviço "db".
+# ============================================================
+
+version: '3.9'
+
+services:
+  # ---- Aplicação Javos (Backend + Frontend) ----
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: javos-app
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      JWT_SECRET: ${JWT_SECRET:-javos-change-this-secret-in-production}
+      # Para usar MySQL, descomente as variáveis abaixo:
+      # SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/javos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      # SPRING_DATASOURCE_USERNAME: javos_user
+      # SPRING_DATASOURCE_PASSWORD: javos_password
+      # SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+    volumes:
+      - javos-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+
+  # ---- MySQL (descomente para usar MySQL em vez de SQLite) ----
+  # db:
+  #   image: mysql:8.0
+  #   container_name: javos-db
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+  #     MYSQL_DATABASE: javos
+  #     MYSQL_USER: javos_user
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD:-javos_password}
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - javos-mysql-data:/var/lib/mysql
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+volumes:
+  javos-data:
+    driver: local
+  # javos-mysql-data:
+  #   driver: local
