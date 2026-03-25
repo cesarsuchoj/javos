@@ -5,7 +5,10 @@ spring:
   jpa:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
   security:
     user:
       name: test
