@@ -22,11 +22,19 @@ spring:
   jpa:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: false
     properties:
       hibernate:
         format_sql: true
+
+  # ----------------------------------------------------------
+  # Flyway - Migrations
+  # ----------------------------------------------------------
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
 
   # ----------------------------------------------------------
   # Banco de Dados - MySQL (descomente para usar)
@@ -40,8 +48,12 @@ spring:
   # jpa:
   #   database-platform: org.hibernate.dialect.MySQLDialect
   #   hibernate:
-  #     ddl-auto: update
+  #     ddl-auto: none
   #   show-sql: false
+  #
+  # flyway:
+  #   enabled: true
+  #   locations: classpath:db/migration
 
 # ----------------------------------------------------------
 # Segurança JWT
