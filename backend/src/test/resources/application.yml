@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: "jdbc:sqlite::memory:"
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: create-drop
+  security:
+    user:
+      name: test
+      password: test
+
+javos:
+  jwt:
+    secret: test-secret-key-for-testing-purposes-only-must-be-long-enough
+    expiration-ms: 3600000
