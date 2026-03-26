@@ -1,9 +1,9 @@
 # ============================================================
 # Javos - Configuração da Aplicação
 # ============================================================
-# Banco de dados padrão: SQLite
-# Para trocar para MySQL, comente o bloco SQLite abaixo e
-# descomente o bloco MySQL. Veja também /docs/README.md.
+# Banco de dados padrão: SQLite (configurável via variáveis de
+# ambiente). Para trocar de banco, edite o arquivo .env na
+# pasta deploy/ e reinicie a aplicação.
 # ============================================================
 
 spring:
@@ -11,16 +11,17 @@ spring:
     name: javos
 
   # ----------------------------------------------------------
-  # Banco de Dados - SQLite (padrão)
+  # Banco de Dados
+  # Padrão: SQLite  |  Alternativa: MySQL (via variáveis de ambiente)
   # ----------------------------------------------------------
   datasource:
-    url: jdbc:sqlite:./data/javos.db
-    driver-class-name: org.sqlite.JDBC
-    username:
-    password:
+    url: ${SPRING_DATASOURCE_URL:jdbc:sqlite:./data/javos.db}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.sqlite.JDBC}
+    username: ${SPRING_DATASOURCE_USERNAME:}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
 
   jpa:
-    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.community.dialect.SQLiteDialect}
     hibernate:
       ddl-auto: none
     show-sql: false
@@ -35,25 +36,6 @@ spring:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
-
-  # ----------------------------------------------------------
-  # Banco de Dados - MySQL (descomente para usar)
-  # ----------------------------------------------------------
-  # datasource:
-  #   url: jdbc:mysql://localhost:3306/javos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-  #   driver-class-name: com.mysql.cj.jdbc.Driver
-  #   username: javos_user
-  #   password: javos_password
-  #
-  # jpa:
-  #   database-platform: org.hibernate.dialect.MySQLDialect
-  #   hibernate:
-  #     ddl-auto: none
-  #   show-sql: false
-  #
-  # flyway:
-  #   enabled: true
-  #   locations: classpath:db/migration
 
 # ----------------------------------------------------------
 # Segurança JWT
