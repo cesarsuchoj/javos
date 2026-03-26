@@ -1,0 +1,15 @@
+CREATE TABLE categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    type TEXT NOT NULL,
+    description TEXT,
+    active BOOLEAN NOT NULL DEFAULT 1
+);
+
+CREATE TABLE accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    type TEXT NOT NULL,
+    balance REAL DEFAULT 0,
+    active BOOLEAN NOT NULL DEFAULT 1
+);
