@@ -3,7 +3,10 @@ import styles from './Sidebar.module.css'
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { path: '/users', label: 'Usuários', icon: '👥' },
+  { path: '/clients', label: 'Clientes', icon: '👥' },
+  { path: '/products', label: 'Produtos', icon: '📦' },
+  { path: '/service-orders', label: 'Ordens de Serviço', icon: '🔧' },
+  { path: '/financial', label: 'Financeiro', icon: '💰' },
 ]
 
 export default function Sidebar() {
