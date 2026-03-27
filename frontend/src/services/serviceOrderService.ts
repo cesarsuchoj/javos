@@ -16,7 +16,7 @@ export const serviceOrderService = {
 
   updateStatus: (id: number, status: ServiceOrderStatus): Promise<ServiceOrder> =>
     api
-      .patch<ServiceOrder>(`/v1/service-orders/${id}/status`, { status })
+      .patch<ServiceOrder>(`/v1/service-orders/${id}/status`, null, { params: { status } })
       .then((r) => r.data),
 
   delete: (id: number): Promise<void> =>
