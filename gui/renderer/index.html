@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';" />
+  <title>Javos — Gerenciamento de Deploy</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ===================== HEADER ===================== -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-logo">J</div>
+      <div class="brand-info">
+        <span class="brand-name">Javos</span>
+        <span class="brand-sub">Gerenciamento de Deploy</span>
+      </div>
+    </div>
+    <div class="header-status" id="headerStatus">
+      <span class="status-dot dot-unknown" id="headerDot"></span>
+      <span id="headerStatusText">Verificando...</span>
+    </div>
+  </header>
+
+  <!-- ===================== NAV TABS ===================== -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="dashboard">
+      <span class="tab-icon">⊞</span> Dashboard
+    </button>
+    <button class="tab-btn" data-tab="logs">
+      <span class="tab-icon">≡</span> Logs
+    </button>
+    <button class="tab-btn" data-tab="config">
+      <span class="tab-icon">⚙</span> Configurações
+    </button>
+    <button class="tab-btn" data-tab="backup">
+      <span class="tab-icon">⊙</span> Backup
+    </button>
+  </nav>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <main class="main-content">
+
+    <!-- ===== TAB: DASHBOARD ===== -->
+    <section class="tab-panel active" id="tab-dashboard">
+      <!-- Ações principais -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Controle dos Serviços</h2>
+          <button class="btn btn-sm btn-ghost" id="btnRefreshStatus" title="Atualizar status">
+            ↻ Atualizar
+          </button>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-success" id="btnStart">
+            <span class="btn-icon">▶</span> Iniciar
+          </button>
+          <button class="btn btn-danger" id="btnStop">
+            <span class="btn-icon">■</span> Parar
+          </button>
+          <button class="btn btn-warning" id="btnRestart">
+            <span class="btn-icon">↺</span> Reiniciar
+          </button>
+        </div>
+        <!-- Saída dos scripts -->
+        <div class="script-output-wrap" id="scriptOutputWrap" style="display:none">
+          <div class="script-output-header">
+            <span>Saída do comando</span>
+            <button class="btn btn-xs btn-ghost" id="btnClearOutput">Limpar</button>
+          </div>
+          <pre class="script-output" id="scriptOutput"></pre>
+        </div>
+      </div>
+
+      <!-- Status dos containers -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Status dos Containers</h2>
+        </div>
+        <div id="servicesList">
+          <div class="loading-row">
+            <span class="spinner"></span> Verificando containers...
+          </div>
+        </div>
+        <div class="no-services" id="noServices" style="display:none">
+          <div class="empty-icon">⊘</div>
+          <p>Nenhum container Javos encontrado.</p>
+          <p class="text-muted">Clique em <strong>Iniciar</strong> para subir os serviços.</p>
+        </div>
+      </div>
+
+      <!-- Informações do sistema -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Informações do Sistema</h2>
+        </div>
+        <div class="info-grid" id="systemInfo">
+          <div class="loading-row"><span class="spinner"></span> Carregando...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: LOGS ===== -->
+    <section class="tab-panel" id="tab-logs">
+      <div class="card logs-card">
+        <div class="card-header">
+          <h2 class="card-title">Logs em Tempo Real</h2>
+          <div class="log-controls">
+            <label class="toggle-label">
+              <input type="checkbox" id="chkAutoScroll" checked />
+              <span>Auto-scroll</span>
+            </label>
+            <button class="btn btn-sm btn-primary" id="btnLogsStart">
+              ▶ Iniciar
+            </button>
+            <button class="btn btn-sm btn-danger" id="btnLogsStop">
+              ■ Parar
+            </button>
+            <button class="btn btn-sm btn-ghost" id="btnLogsClear">
+              ⌫ Limpar
+            </button>
+            <button class="btn btn-sm btn-ghost" id="btnLogsSave">
+              ⬇ Salvar
+            </button>
+          </div>
+        </div>
+        <div class="log-status-bar" id="logStatusBar">
+          <span class="status-dot dot-unknown" id="logDot"></span>
+          <span id="logStatusText">Parado</span>
+          <span class="log-line-count" id="logLineCount">0 linhas</span>
+        </div>
+        <div class="log-viewer" id="logViewer"></div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: CONFIGURAÇÕES ===== -->
+    <section class="tab-panel" id="tab-config">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Configurações do Sistema</h2>
+          <div class="config-header-actions">
+            <button class="btn btn-sm btn-ghost" id="btnOpenDeployDir">
+              📁 Abrir pasta
+            </button>
+          </div>
+        </div>
+
+        <div class="config-notice" id="configNotice" style="display:none">
+          <span class="notice-icon">⚠</span>
+          <span>Arquivo <code>.env</code> não encontrado — exibindo valores padrão do <code>.env.example</code>.
+            Salve para criar o arquivo.</span>
+        </div>
+
+        <form id="configForm" class="config-form">
+          <!-- Seção: Aplicação -->
+          <div class="config-section">
+            <h3 class="config-section-title">Aplicação</h3>
+            <div class="form-row">
+              <label class="form-label" for="cfg_APP_PORT">
+                Porta da Aplicação
+                <span class="form-hint">Porta em que o Javos ficará disponível</span>
+              </label>
+              <input class="form-input" type="text" id="cfg_APP_PORT" name="APP_PORT"
+                placeholder="8080" />
+            </div>
+          </div>
+
+          <!-- Seção: Segurança -->
+          <div class="config-section">
+            <h3 class="config-section-title">Segurança</h3>
+            <div class="form-row">
+              <label class="form-label" for="cfg_JWT_SECRET">
+                Chave JWT
+                <span class="form-hint">Altere para uma string aleatória longa em produção</span>
+              </label>
+              <div class="input-with-action">
+                <input class="form-input" type="password" id="cfg_JWT_SECRET" name="JWT_SECRET"
+                  placeholder="Chave secreta JWT" />
+                <button type="button" class="btn btn-xs btn-ghost" id="btnToggleJwt">
+                  👁 Mostrar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção: Banco de dados -->
+          <div class="config-section">
+            <h3 class="config-section-title">Banco de Dados</h3>
+            <div class="form-row">
+              <label class="form-label" for="cfg_SPRING_DATASOURCE_URL">
+                URL do Banco
+                <span class="form-hint">jdbc:sqlite:./data/javos.db ou jdbc:mysql://...</span>
+              </label>
+              <input class="form-input" type="text" id="cfg_SPRING_DATASOURCE_URL"
+                name="SPRING_DATASOURCE_URL" placeholder="jdbc:sqlite:./data/javos.db" />
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="cfg_SPRING_DATASOURCE_DRIVER_CLASS_NAME">
+                Driver JDBC
+              </label>
+              <input class="form-input" type="text" id="cfg_SPRING_DATASOURCE_DRIVER_CLASS_NAME"
+                name="SPRING_DATASOURCE_DRIVER_CLASS_NAME" placeholder="org.sqlite.JDBC" />
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="cfg_SPRING_DATASOURCE_USERNAME">
+                Usuário do Banco
+              </label>
+              <input class="form-input" type="text" id="cfg_SPRING_DATASOURCE_USERNAME"
+                name="SPRING_DATASOURCE_USERNAME" placeholder="(vazio para SQLite)" />
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="cfg_SPRING_DATASOURCE_PASSWORD">
+                Senha do Banco
+              </label>
+              <input class="form-input" type="password" id="cfg_SPRING_DATASOURCE_PASSWORD"
+                name="SPRING_DATASOURCE_PASSWORD" placeholder="(vazio para SQLite)" />
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="cfg_SPRING_JPA_DATABASE_PLATFORM">
+                Dialeto JPA
+              </label>
+              <input class="form-input" type="text" id="cfg_SPRING_JPA_DATABASE_PLATFORM"
+                name="SPRING_JPA_DATABASE_PLATFORM"
+                placeholder="org.hibernate.community.dialect.SQLiteDialect" />
+            </div>
+          </div>
+
+          <!-- Botões de ação -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" id="btnConfigReload">
+              ↺ Recarregar
+            </button>
+            <button type="submit" class="btn btn-primary" id="btnConfigSave">
+              💾 Salvar Configurações
+            </button>
+          </div>
+        </form>
+
+        <div class="config-save-msg" id="configSaveMsg" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: BACKUP ===== -->
+    <section class="tab-panel" id="tab-backup">
+      <!-- Backup -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Criar Backup</h2>
+        </div>
+        <p class="card-desc">
+          Cria um arquivo <code>.tar.gz</code> com todos os dados do banco de dados do Javos.
+          Você escolherá a pasta de destino.
+        </p>
+        <div class="backup-action">
+          <button class="btn btn-primary btn-lg" id="btnBackup">
+            <span class="btn-icon">⬆</span> Criar Backup Agora
+          </button>
+        </div>
+        <div class="backup-output-wrap" id="backupOutputWrap" style="display:none">
+          <div class="script-output-header">
+            <span>Saída do backup</span>
+          </div>
+          <pre class="script-output" id="backupOutput"></pre>
+        </div>
+      </div>
+
+      <!-- Restore -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Restaurar Backup</h2>
+        </div>
+        <div class="warning-box">
+          <span class="warning-icon">⚠</span>
+          <div>
+            <strong>Atenção:</strong> A restauração substituirá <em>todos os dados atuais</em>
+            pelos dados do backup selecionado. Esta operação não pode ser desfeita.
+          </div>
+        </div>
+        <p class="card-desc">
+          Selecione um arquivo de backup <code>.tar.gz</code> gerado anteriormente pelo Javos.
+        </p>
+        <div class="backup-action">
+          <button class="btn btn-warning btn-lg" id="btnRestore">
+            <span class="btn-icon">⬇</span> Restaurar Backup...
+          </button>
+        </div>
+        <div class="backup-output-wrap" id="restoreOutputWrap" style="display:none">
+          <div class="script-output-header">
+            <span>Saída da restauração</span>
+          </div>
+          <pre class="script-output" id="restoreOutput"></pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== TOAST NOTIFICATION ===================== -->
+  <div class="toast" id="toast"></div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
