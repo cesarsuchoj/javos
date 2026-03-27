@@ -12,7 +12,8 @@
 4. [Como Trocar de SQLite para MySQL](#como-trocar-de-sqlite-para-mysql)
 5. [Estrutura de Pastas](#estrutura-de-pastas)
 6. [Convenções](#convenções)
-7. [Licença](#licença)
+7. [Guias por Sistema Operacional](#guias-por-sistema-operacional)
+8. [Licença](#licença)
 
 ---
 
@@ -237,6 +238,20 @@ javos/
 ### Git
 - **Branches**: `feature/<nome>`, `fix/<nome>`, `docs/<nome>`
 - **Commits**: mensagens em inglês, imperativo (ex: `Add user authentication`)
+
+---
+
+## 🖥️ Guias por Sistema Operacional
+
+Para instruções detalhadas de instalação, operação e solução de problemas em cada plataforma:
+
+| Sistema | Guia |
+|---------|------|
+| 🪟 Windows (10 e 11) | [docs/README-windows.md](README-windows.md) |
+| 🍎 macOS (incluindo Apple Silicon M1/M2/M3) | [docs/README-macos.md](README-macos.md) |
+| 🐧 Linux (Ubuntu, Debian, Fedora e outros) | [docs/README-linux.md](README-linux.md) |
+| ❓ Perguntas Frequentes (FAQ) | [docs/FAQ.md](FAQ.md) |
+| ✅ Checklist de testes multiplataforma | [docs/CHECKLIST.md](CHECKLIST.md) |
 
 ---
 

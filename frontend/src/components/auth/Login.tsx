@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '../../services/authService'
 import { useAuthStore } from '../../store/authStore'
+import { getErrorMessage } from '../../services/api'
 import styles from './Login.module.css'
 
 export default function Login() {
@@ -20,8 +21,8 @@ export default function Login() {
       const response = await authService.login({ username, password })
       login(response.token, response.username, response.name, response.role)
       navigate('/dashboard')
-    } catch {
-      setError('Usuário ou senha inválidos. Tente novamente.')
+    } catch (err) {
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -35,7 +36,11 @@ export default function Login() {
           <p className={styles.subtitle}>Sistema de Gestão</p>
         </div>
         <form onSubmit={handleSubmit} className={styles.form}>
-          {error && <div className={styles.error}>{error}</div>}
+          {error && (
+            <div className={styles.error} role="alert">
+              {error}
+            </div>
+          )}
           <div className={styles.field}>
             <label htmlFor="username" className={styles.label}>
               Usuário

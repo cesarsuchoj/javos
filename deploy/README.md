@@ -3,6 +3,8 @@
 Bem-vindo! Este guia vai te ajudar a instalar e usar o **Javos** no seu computador, mesmo sem conhecimento técnico.
 
 > 🍎 **Usuário de Mac (especialmente M1/M2/M3)?** Veja o guia dedicado: [`../docs/README-macos.md`](../docs/README-macos.md)
+> 🪟 **Usuário de Windows?** Veja o guia dedicado: [`../docs/README-windows.md`](../docs/README-windows.md)
+> 🐧 **Usuário de Linux?** Veja o guia dedicado: [`../docs/README-linux.md`](../docs/README-linux.md)
 
 ---
 

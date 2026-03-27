@@ -20,6 +20,16 @@ Acesse [http://localhost:8080](http://localhost:8080) — usuário: `admin` / se
 
 Consulte a documentação completa em [`/docs/README.md`](docs/README.md).
 
+### Guias por Sistema Operacional
+
+| Sistema | Guia |
+|---------|------|
+| 🪟 Windows | [`docs/README-windows.md`](docs/README-windows.md) |
+| 🍎 macOS (incluindo M1/M2/M3) | [`docs/README-macos.md`](docs/README-macos.md) |
+| 🐧 Linux | [`docs/README-linux.md`](docs/README-linux.md) |
+| ❓ FAQ | [`docs/FAQ.md`](docs/FAQ.md) |
+| ✅ Checklist Multiplataforma | [`docs/CHECKLIST.md`](docs/CHECKLIST.md) |
+
 ## Estrutura do Projeto
 
 | Pasta       | Descrição                                      |
