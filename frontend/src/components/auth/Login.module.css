@@ -66,6 +66,14 @@
   border-color: #0f3460;
 }
 
+.inputError {
+  border-color: #c53030;
+}
+
+.inputError:focus {
+  border-color: #c53030;
+}
+
 .button {
   padding: 0.875rem;
   background: #0f3460;
@@ -87,6 +95,24 @@
 .button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  margin-right: 0.5rem;
+  vertical-align: middle;
 }
 
 .error {

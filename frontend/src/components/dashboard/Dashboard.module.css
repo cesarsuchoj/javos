@@ -41,9 +41,77 @@
 }
 
 .loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
   padding: 2rem;
   text-align: center;
   color: #718096;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0f3460;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeletonLabel,
+.skeletonValue {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f7fafc 50%, #e2e8f0 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+.skeletonLabel {
+  height: 12px;
+  width: 60%;
+}
+
+.skeletonValue {
+  height: 28px;
+  width: 40%;
+  margin-top: 0.5rem;
+}
+
+.retryBtn {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.875rem;
+  background: #c53030;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.retryBtn:hover {
+  background: #9b2c2c;
 }
 
 .error {
@@ -52,5 +120,9 @@
   border: 1px solid #fed7d7;
   border-radius: 8px;
   color: #c53030;
-  margin: 2rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
 }

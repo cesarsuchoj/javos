@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useClientStore } from '../store/clientStore'
 import { Client, ClientRequest } from '../types'
 import { getErrorMessage } from '../services/api'
+import { useNotification } from '../hooks/useNotification'
 import Modal from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import styles from './crud.module.css'
@@ -23,6 +24,7 @@ export default function ClientsPage() {
   const { clients, loading, error, fetchAll, create, update, remove, clearError } =
     useClientStore()
 
+  const { notification, notify, clearNotification } = useNotification()
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Client | null>(null)
@@ -79,8 +81,10 @@ export default function ClientsPage() {
     try {
       if (editing) {
         await update(editing.id, form)
+        notify('success', 'Cliente atualizado com sucesso.')
       } else {
         await create(form)
+        notify('success', 'Cliente criado com sucesso.')
       }
       setModalOpen(false)
     } catch (err) {
@@ -95,8 +99,9 @@ export default function ClientsPage() {
     setDeleting(true)
     try {
       await remove(deleteTarget.id)
+      notify('success', `Cliente "${deleteTarget.name}" excluído com sucesso.`)
     } catch (err) {
-      alert(getErrorMessage(err))
+      notify('error', getErrorMessage(err))
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -139,6 +144,22 @@ export default function ClientsPage() {
         </div>
       </div>
 
+      {notification && (
+        <div
+          className={`${styles.notification} ${notification.type === 'success' ? styles.notificationSuccess : styles.notificationError}`}
+          role={notification.type === 'error' ? 'alert' : 'status'}
+        >
+          {notification.message}
+          <button
+            className={styles.notificationClose}
+            onClick={clearNotification}
+            aria-label="Fechar notificação"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {error && (
         <div className={styles.error} role="alert">
           {error}
@@ -149,7 +170,10 @@ export default function ClientsPage() {
       )}
 
       {loading ? (
-        <div className={styles.loading}>Carregando...</div>
+        <div className={styles.loading}>
+          <span className={styles.spinner} aria-hidden="true" />
+          Carregando...
+        </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>

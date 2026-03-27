@@ -9,22 +9,50 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true)
+    setError('')
     dashboardService
       .getSummary()
       .then(setSummary)
       .catch((err) => setError(getErrorMessage(err)))
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    load()
   }, [])
 
   if (loading) {
-    return <div className={styles.loading}>Carregando...</div>
+    return (
+      <div className={styles.container}>
+        <h2 className={styles.title}>Resumo do Sistema</h2>
+        <div className={styles.cards}>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className={styles.card}>
+              <span className={styles.skeletonLabel} aria-hidden="true" />
+              <span className={styles.skeletonValue} aria-hidden="true" />
+            </div>
+          ))}
+        </div>
+        <p className={styles.loading}>
+          <span className={styles.spinner} aria-hidden="true" />
+          Carregando...
+        </p>
+      </div>
+    )
   }
 
   if (error) {
     return (
-      <div className={styles.error} role="alert">
-        {error}
+      <div className={styles.container}>
+        <h2 className={styles.title}>Resumo do Sistema</h2>
+        <div className={styles.error} role="alert">
+          {error}
+          <button onClick={load} className={styles.retryBtn}>
+            Tentar novamente
+          </button>
+        </div>
       </div>
     )
   }

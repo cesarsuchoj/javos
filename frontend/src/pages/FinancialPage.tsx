@@ -17,6 +17,7 @@ import {
   EntryType,
 } from '../types'
 import { getErrorMessage } from '../services/api'
+import { useNotification } from '../hooks/useNotification'
 import Modal from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import styles from './crud.module.css'
@@ -78,6 +79,7 @@ function ChargesSection() {
     useFinancialStore()
   const { clients, fetchAll: fetchClients } = useClientStore()
 
+  const { notification, notify, clearNotification } = useNotification()
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Charge | null>(null)
   const [form, setForm] = useState<ChargeRequest>(emptyCharge)
@@ -123,8 +125,10 @@ function ChargesSection() {
     try {
       if (editing) {
         await updateCharge(editing.id, form)
+        notify('success', 'Cobrança atualizada com sucesso.')
       } else {
         await createCharge(form)
+        notify('success', 'Cobrança criada com sucesso.')
       }
       setModalOpen(false)
     } catch (err) {
@@ -139,8 +143,9 @@ function ChargesSection() {
     setDeleting(true)
     try {
       await removeCharge(deleteTarget.id)
+      notify('success', 'Cobrança excluída com sucesso.')
     } catch (err) {
-      alert(getErrorMessage(err))
+      notify('error', getErrorMessage(err))
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -156,6 +161,16 @@ function ChargesSection() {
         </button>
       </div>
 
+      {notification && (
+        <div
+          className={`${styles.notification} ${notification.type === 'success' ? styles.notificationSuccess : styles.notificationError}`}
+          role={notification.type === 'error' ? 'alert' : 'status'}
+        >
+          {notification.message}
+          <button className={styles.notificationClose} onClick={clearNotification} aria-label="Fechar notificação">✕</button>
+        </div>
+      )}
+
       {error && (
         <div className={styles.error} role="alert">
           {error}
@@ -166,7 +181,10 @@ function ChargesSection() {
       )}
 
       {loading ? (
-        <div className={styles.loading}>Carregando...</div>
+        <div className={styles.loading}>
+          <span className={styles.spinner} aria-hidden="true" />
+          Carregando...
+        </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
@@ -325,6 +343,7 @@ function AccountsSection() {
   const { accounts, loading, error, fetchAccounts, createAccount, updateAccount, removeAccount, clearError } =
     useFinancialStore()
 
+  const { notification, notify, clearNotification } = useNotification()
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Account | null>(null)
   const [form, setForm] = useState<AccountRequest>(emptyAccount)
@@ -362,8 +381,10 @@ function AccountsSection() {
     try {
       if (editing) {
         await updateAccount(editing.id, form)
+        notify('success', 'Conta atualizada com sucesso.')
       } else {
         await createAccount(form)
+        notify('success', 'Conta criada com sucesso.')
       }
       setModalOpen(false)
     } catch (err) {
@@ -378,8 +399,9 @@ function AccountsSection() {
     setDeleting(true)
     try {
       await removeAccount(deleteTarget.id)
+      notify('success', `Conta "${deleteTarget.name}" excluída com sucesso.`)
     } catch (err) {
-      alert(getErrorMessage(err))
+      notify('error', getErrorMessage(err))
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -395,6 +417,16 @@ function AccountsSection() {
         </button>
       </div>
 
+      {notification && (
+        <div
+          className={`${styles.notification} ${notification.type === 'success' ? styles.notificationSuccess : styles.notificationError}`}
+          role={notification.type === 'error' ? 'alert' : 'status'}
+        >
+          {notification.message}
+          <button className={styles.notificationClose} onClick={clearNotification} aria-label="Fechar notificação">✕</button>
+        </div>
+      )}
+
       {error && (
         <div className={styles.error} role="alert">
           {error}
@@ -403,7 +435,10 @@ function AccountsSection() {
       )}
 
       {loading ? (
-        <div className={styles.loading}>Carregando...</div>
+        <div className={styles.loading}>
+          <span className={styles.spinner} aria-hidden="true" />
+          Carregando...
+        </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
@@ -525,6 +560,7 @@ function CategoriesSection() {
   const { categories, loading, error, fetchCategories, createCategory, updateCategory, removeCategory, clearError } =
     useFinancialStore()
 
+  const { notification, notify, clearNotification } = useNotification()
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Category | null>(null)
   const [form, setForm] = useState<CategoryRequest>(emptyCategory)
@@ -562,8 +598,10 @@ function CategoriesSection() {
     try {
       if (editing) {
         await updateCategory(editing.id, form)
+        notify('success', 'Categoria atualizada com sucesso.')
       } else {
         await createCategory(form)
+        notify('success', 'Categoria criada com sucesso.')
       }
       setModalOpen(false)
     } catch (err) {
@@ -578,8 +616,9 @@ function CategoriesSection() {
     setDeleting(true)
     try {
       await removeCategory(deleteTarget.id)
+      notify('success', `Categoria "${deleteTarget.name}" excluída com sucesso.`)
     } catch (err) {
-      alert(getErrorMessage(err))
+      notify('error', getErrorMessage(err))
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -595,6 +634,16 @@ function CategoriesSection() {
         </button>
       </div>
 
+      {notification && (
+        <div
+          className={`${styles.notification} ${notification.type === 'success' ? styles.notificationSuccess : styles.notificationError}`}
+          role={notification.type === 'error' ? 'alert' : 'status'}
+        >
+          {notification.message}
+          <button className={styles.notificationClose} onClick={clearNotification} aria-label="Fechar notificação">✕</button>
+        </div>
+      )}
+
       {error && (
         <div className={styles.error} role="alert">
           {error}
@@ -603,7 +652,10 @@ function CategoriesSection() {
       )}
 
       {loading ? (
-        <div className={styles.loading}>Carregando...</div>
+        <div className={styles.loading}>
+          <span className={styles.spinner} aria-hidden="true" />
+          Carregando...
+        </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
@@ -733,6 +785,7 @@ function EntriesSection() {
   const { entries, accounts, categories, loading, error, fetchEntries, fetchAccounts, fetchCategories, createEntry, updateEntry, removeEntry, clearError } =
     useFinancialStore()
 
+  const { notification, notify, clearNotification } = useNotification()
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<FinancialEntry | null>(null)
   const [form, setForm] = useState<FinancialEntryRequest>(emptyEntry)
@@ -786,8 +839,10 @@ function EntriesSection() {
     try {
       if (editing) {
         await updateEntry(editing.id, form)
+        notify('success', 'Lançamento atualizado com sucesso.')
       } else {
         await createEntry(form)
+        notify('success', 'Lançamento criado com sucesso.')
       }
       setModalOpen(false)
     } catch (err) {
@@ -802,8 +857,9 @@ function EntriesSection() {
     setDeleting(true)
     try {
       await removeEntry(deleteTarget.id)
+      notify('success', `Lançamento "${deleteTarget.description}" excluído com sucesso.`)
     } catch (err) {
-      alert(getErrorMessage(err))
+      notify('error', getErrorMessage(err))
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -819,6 +875,16 @@ function EntriesSection() {
         </button>
       </div>
 
+      {notification && (
+        <div
+          className={`${styles.notification} ${notification.type === 'success' ? styles.notificationSuccess : styles.notificationError}`}
+          role={notification.type === 'error' ? 'alert' : 'status'}
+        >
+          {notification.message}
+          <button className={styles.notificationClose} onClick={clearNotification} aria-label="Fechar notificação">✕</button>
+        </div>
+      )}
+
       {error && (
         <div className={styles.error} role="alert">
           {error}
@@ -827,7 +893,10 @@ function EntriesSection() {
       )}
 
       {loading ? (
-        <div className={styles.loading}>Carregando...</div>
+        <div className={styles.loading}>
+          <span className={styles.spinner} aria-hidden="true" />
+          Carregando...
+        </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>

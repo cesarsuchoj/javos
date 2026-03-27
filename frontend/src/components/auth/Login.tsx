@@ -12,10 +12,21 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState({ username: false, password: false })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    const errors = { username: !username.trim(), password: !password.trim() }
+    setFieldErrors(errors)
+    if (errors.username) {
+      setError('O campo usuário é obrigatório.')
+      return
+    }
+    if (errors.password) {
+      setError('O campo senha é obrigatório.')
+      return
+    }
     setLoading(true)
     try {
       const response = await authService.login({ username, password })
@@ -49,11 +60,15 @@ export default function Login() {
               id="username"
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className={styles.input}
+              onChange={(e) => {
+                setUsername(e.target.value)
+                if (fieldErrors.username) setFieldErrors((f) => ({ ...f, username: false }))
+              }}
+              className={`${styles.input} ${fieldErrors.username ? styles.inputError : ''}`}
               placeholder="Digite seu usuário"
-              required
               autoFocus
+              aria-invalid={fieldErrors.username}
+              aria-describedby={fieldErrors.username ? 'username-error' : undefined}
             />
           </div>
           <div className={styles.field}>
@@ -64,14 +79,25 @@ export default function Login() {
               id="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={styles.input}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                if (fieldErrors.password) setFieldErrors((f) => ({ ...f, password: false }))
+              }}
+              className={`${styles.input} ${fieldErrors.password ? styles.inputError : ''}`}
               placeholder="Digite sua senha"
-              required
+              aria-invalid={fieldErrors.password}
+              aria-describedby={fieldErrors.password ? 'password-error' : undefined}
             />
           </div>
           <button type="submit" className={styles.button} disabled={loading}>
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loading ? (
+              <>
+                <span className={styles.spinner} aria-hidden="true" />
+                Entrando...
+              </>
+            ) : (
+              'Entrar'
+            )}
           </button>
         </form>
       </div>
