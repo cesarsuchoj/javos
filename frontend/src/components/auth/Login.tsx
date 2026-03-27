@@ -30,7 +30,7 @@ export default function Login() {
     setLoading(true)
     try {
       const response = await authService.login({ username, password })
-      login(response.token, response.username, response.name, response.role)
+      login(response.token, response.refreshToken, response.username, response.name, response.role)
       navigate('/dashboard')
     } catch (err) {
       setError(getErrorMessage(err))

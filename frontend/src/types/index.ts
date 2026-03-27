@@ -15,10 +15,12 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string
+  refreshToken: string
   type: string
   username: string
   name: string
   role: string
+  expiresIn: number
 }
 
 export interface RegisterRequest {

@@ -44,6 +44,7 @@ javos:
   jwt:
     secret: ${JWT_SECRET:javos-default-secret-key-change-in-production-must-be-at-least-256-bits}
     expiration-ms: 86400000  # 24 horas
+    refresh-token-expiry-days: ${JWT_REFRESH_TOKEN_EXPIRY_DAYS:7}  # 7 dias
 
 # ----------------------------------------------------------
 # Servidor

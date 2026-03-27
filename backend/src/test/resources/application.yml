@@ -18,6 +18,7 @@ javos:
   jwt:
     secret: test-secret-key-for-testing-purposes-only-must-be-long-enough
     expiration-ms: 3600000
+    refresh-token-expiry-days: 1
 
 springdoc:
   api-docs:
