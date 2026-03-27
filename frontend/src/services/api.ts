@@ -27,4 +27,45 @@ api.interceptors.response.use(
   },
 )
 
+/**
+ * Retorna uma mensagem de erro amigável baseada no tipo de falha da requisição.
+ *
+ * Casos tratados:
+ * - Sem resposta (rede indisponível): mensagem de conexão
+ * - 400 Bad Request: dados inválidos
+ * - 401 Unauthorized: credenciais incorretas
+ * - 403 Forbidden: sem permissão
+ * - 404 Not Found: recurso não encontrado
+ * - 409 Conflict: registro duplicado
+ * - 500 Internal Server Error: erro interno do servidor
+ * - 503 Service Unavailable: serviço temporariamente indisponível
+ * - Outros: mensagem genérica
+ */
+export function getErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    if (!error.response) {
+      return 'Não foi possível conectar ao servidor. Verifique se a aplicação está rodando e tente novamente.'
+    }
+    switch (error.response.status) {
+      case 400:
+        return error.response.data?.message || 'Os dados informados são inválidos. Verifique e tente novamente.'
+      case 401:
+        return 'Usuário ou senha incorretos. Verifique os dados e tente novamente.'
+      case 403:
+        return 'Você não tem permissão para realizar esta ação.'
+      case 404:
+        return 'O recurso solicitado não foi encontrado.'
+      case 409:
+        return error.response.data?.message || 'Este registro já existe no sistema.'
+      case 500:
+        return 'Ocorreu um erro interno no servidor. Tente novamente em alguns instantes.'
+      case 503:
+        return 'O serviço está temporariamente indisponível. Tente novamente em alguns instantes.'
+      default:
+        return error.response.data?.message || 'Ocorreu um erro inesperado. Tente novamente.'
+    }
+  }
+  return 'Ocorreu um erro inesperado. Tente novamente.'
+}
+
 export default api

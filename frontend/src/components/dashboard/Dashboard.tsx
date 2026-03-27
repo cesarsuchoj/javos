@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { dashboardService } from '../../services/dashboardService'
+import { getErrorMessage } from '../../services/api'
 import { DashboardSummary } from '../../types'
 import styles from './Dashboard.module.css'
 
@@ -12,7 +13,7 @@ export default function Dashboard() {
     dashboardService
       .getSummary()
       .then(setSummary)
-      .catch(() => setError('Não foi possível carregar o resumo.'))
+      .catch((err) => setError(getErrorMessage(err)))
       .finally(() => setLoading(false))
   }, [])
 
@@ -21,7 +22,11 @@ export default function Dashboard() {
   }
 
   if (error) {
-    return <div className={styles.error}>{error}</div>
+    return (
+      <div className={styles.error} role="alert">
+        {error}
+      </div>
+    )
   }
 
   return (
