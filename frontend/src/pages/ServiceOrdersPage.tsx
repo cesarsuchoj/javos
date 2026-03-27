@@ -8,6 +8,7 @@ import {
   ServiceOrderPriority,
 } from '../types'
 import { getErrorMessage } from '../services/api'
+import { useNotification } from '../hooks/useNotification'
 import Modal from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import styles from './crud.module.css'
@@ -70,6 +71,7 @@ export default function ServiceOrdersPage() {
   } = useServiceOrderStore()
   const { clients, fetchAll: fetchClients } = useClientStore()
 
+  const { notification, notify, clearNotification } = useNotification()
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<ServiceOrder | null>(null)
@@ -129,8 +131,10 @@ export default function ServiceOrdersPage() {
     try {
       if (editing) {
         await update(editing.id, form)
+        notify('success', 'Ordem de serviço atualizada com sucesso.')
       } else {
         await create(form)
+        notify('success', 'Ordem de serviço criada com sucesso.')
       }
       setModalOpen(false)
     } catch (err) {
@@ -145,8 +149,9 @@ export default function ServiceOrdersPage() {
     setDeleting(true)
     try {
       await remove(deleteTarget.id)
+      notify('success', `OS "${deleteTarget.orderNumber || `#${deleteTarget.id}`}" excluída com sucesso.`)
     } catch (err) {
-      alert(getErrorMessage(err))
+      notify('error', getErrorMessage(err))
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -171,6 +176,22 @@ export default function ServiceOrdersPage() {
         </div>
       </div>
 
+      {notification && (
+        <div
+          className={`${styles.notification} ${notification.type === 'success' ? styles.notificationSuccess : styles.notificationError}`}
+          role={notification.type === 'error' ? 'alert' : 'status'}
+        >
+          {notification.message}
+          <button
+            className={styles.notificationClose}
+            onClick={clearNotification}
+            aria-label="Fechar notificação"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {error && (
         <div className={styles.error} role="alert">
           {error}
@@ -181,7 +202,10 @@ export default function ServiceOrdersPage() {
       )}
 
       {loading ? (
-        <div className={styles.loading}>Carregando...</div>
+        <div className={styles.loading}>
+          <span className={styles.spinner} aria-hidden="true" />
+          Carregando...
+        </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>

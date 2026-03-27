@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useProductStore } from '../store/productStore'
 import { Product, ProductRequest, ProductType } from '../types'
 import { getErrorMessage } from '../services/api'
+import { useNotification } from '../hooks/useNotification'
 import Modal from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import styles from './crud.module.css'
@@ -27,6 +28,7 @@ export default function ProductsPage() {
   const { products, loading, error, fetchAll, create, update, remove, clearError } =
     useProductStore()
 
+  const { notification, notify, clearNotification } = useNotification()
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Product | null>(null)
@@ -85,8 +87,10 @@ export default function ProductsPage() {
     try {
       if (editing) {
         await update(editing.id, form)
+        notify('success', 'Produto atualizado com sucesso.')
       } else {
         await create(form)
+        notify('success', 'Produto criado com sucesso.')
       }
       setModalOpen(false)
     } catch (err) {
@@ -101,8 +105,9 @@ export default function ProductsPage() {
     setDeleting(true)
     try {
       await remove(deleteTarget.id)
+      notify('success', `Produto "${deleteTarget.name}" excluído com sucesso.`)
     } catch (err) {
-      alert(getErrorMessage(err))
+      notify('error', getErrorMessage(err))
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -130,6 +135,22 @@ export default function ProductsPage() {
         </div>
       </div>
 
+      {notification && (
+        <div
+          className={`${styles.notification} ${notification.type === 'success' ? styles.notificationSuccess : styles.notificationError}`}
+          role={notification.type === 'error' ? 'alert' : 'status'}
+        >
+          {notification.message}
+          <button
+            className={styles.notificationClose}
+            onClick={clearNotification}
+            aria-label="Fechar notificação"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {error && (
         <div className={styles.error} role="alert">
           {error}
@@ -140,7 +161,10 @@ export default function ProductsPage() {
       )}
 
       {loading ? (
-        <div className={styles.loading}>Carregando...</div>
+        <div className={styles.loading}>
+          <span className={styles.spinner} aria-hidden="true" />
+          Carregando...
+        </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
