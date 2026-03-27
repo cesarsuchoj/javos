@@ -7,24 +7,38 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-package com.javos.dto;
+package com.javos.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
+@Entity
+@Table(name = "revoked_access_tokens")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponse {
+public class RevokedToken {
 
-    private String token;
-    private String refreshToken;
-    private String type;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true, length = 36)
+    private String jti;
+
+    @Column(nullable = false, length = 50)
     private String username;
-    private String name;
-    private String role;
-    private long expiresIn;
+
+    @Column(nullable = false)
+    private Instant expiryDate;
+
+    @Column(updatable = false)
+    @Builder.Default
+    private Instant revokedAt = Instant.now();
 }
