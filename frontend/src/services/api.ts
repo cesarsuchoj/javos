@@ -29,6 +29,17 @@ api.interceptors.response.use(
 
 /**
  * Retorna uma mensagem de erro amigável baseada no tipo de falha da requisição.
+ *
+ * Casos tratados:
+ * - Sem resposta (rede indisponível): mensagem de conexão
+ * - 400 Bad Request: dados inválidos
+ * - 401 Unauthorized: credenciais incorretas
+ * - 403 Forbidden: sem permissão
+ * - 404 Not Found: recurso não encontrado
+ * - 409 Conflict: registro duplicado
+ * - 500 Internal Server Error: erro interno do servidor
+ * - 503 Service Unavailable: serviço temporariamente indisponível
+ * - Outros: mensagem genérica
  */
 export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
