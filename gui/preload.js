@@ -39,4 +39,8 @@ contextBridge.exposeInMainWorld('javosAPI', {
   // Utilitários
   openDeployDir: () => ipcRenderer.invoke('open-deploy-dir'),
   systemInfo: () => ipcRenderer.invoke('system-info'),
+
+  // Configurações avançadas
+  configGetDefaults: () => ipcRenderer.invoke('config-get-defaults'),
+  dbTestConnection: (params) => ipcRenderer.invoke('db-test-connection', params),
 });

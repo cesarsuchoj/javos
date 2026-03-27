@@ -388,6 +388,62 @@ ipcMain.handle('open-deploy-dir', () => {
   return { ok: true };
 });
 
+// Ler valores padrão do .env.example
+ipcMain.handle('config-get-defaults', () => {
+  if (!fs.existsSync(ENV_EXAMPLE)) return {};
+  const content = fs.readFileSync(ENV_EXAMPLE, 'utf8');
+  const result = {};
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('#') || !trimmed.includes('=')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    const key = trimmed.substring(0, eqIdx).trim();
+    const value = trimmed.substring(eqIdx + 1).trim();
+    if (key) result[key] = value;
+  }
+  return result;
+});
+
+// Testar conexão com o banco de dados
+ipcMain.handle('db-test-connection', async (_event, { type, host, port }) => {
+  if (type === 'sqlite') {
+    return { ok: true, message: 'Configuração SQLite válida (arquivo local, sem conexão de rede necessária).' };
+  }
+
+  const net = require('net');
+  return new Promise((resolve) => {
+    const socket = new net.Socket();
+    const portNum = parseInt(port, 10);
+
+    if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
+      resolve({ ok: false, message: 'Número de porta inválido.' });
+      return;
+    }
+
+    socket.setTimeout(5000);
+
+    socket.on('connect', () => {
+      socket.destroy();
+      resolve({ ok: true, message: `Porta ${portNum} acessível em "${host}".` });
+    });
+
+    socket.on('timeout', () => {
+      socket.destroy();
+      resolve({ ok: false, message: `Timeout: não foi possível conectar em "${host}:${portNum}" (5 s).` });
+    });
+
+    socket.on('error', (err) => {
+      resolve({ ok: false, message: `Erro de conexão: ${err.message}` });
+    });
+
+    try {
+      socket.connect(portNum, host);
+    } catch (err) {
+      resolve({ ok: false, message: `Erro: ${err.message}` });
+    }
+  });
+});
+
 // Informações do sistema
 ipcMain.handle('system-info', () => {
   return {
