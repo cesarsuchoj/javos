@@ -26,7 +26,7 @@ export const chargeService = {
     api.put<Charge>(`/v1/charges/${id}`, data).then((r) => r.data),
 
   updateStatus: (id: number, status: ChargeStatus): Promise<Charge> =>
-    api.patch<Charge>(`/v1/charges/${id}/status`, { status }).then((r) => r.data),
+    api.patch<Charge>(`/v1/charges/${id}/status`, null, { params: { status } }).then((r) => r.data),
 
   delete: (id: number): Promise<void> =>
     api.delete(`/v1/charges/${id}`).then(() => undefined),
