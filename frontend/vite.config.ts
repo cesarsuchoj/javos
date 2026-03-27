@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -18,5 +19,15 @@ export default defineConfig({
     // To build locally without integration, set VITE_OUT_DIR=dist.
     outDir: '../backend/src/main/resources/static',
     emptyOutDir: true,
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './src/setupTests.ts',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      exclude: ['node_modules/', 'src/main.tsx', 'src/vite-env.d.ts'],
+    },
   },
 })
