@@ -162,8 +162,11 @@
                 Porta da Aplicação
                 <span class="form-hint">Porta em que o Javos ficará disponível</span>
               </label>
-              <input class="form-input" type="text" id="cfg_APP_PORT" name="APP_PORT"
-                placeholder="8080" />
+              <div class="input-validated">
+                <input class="form-input" type="number" id="cfg_APP_PORT" name="APP_PORT"
+                  min="1" max="65535" placeholder="8080" />
+                <span class="vi" id="vi_app_port"></span>
+              </div>
             </div>
           </div>
 
@@ -185,45 +188,102 @@
             </div>
           </div>
 
-          <!-- Seção: Banco de dados -->
+          <!-- Seção: Banco de Dados -->
           <div class="config-section">
             <h3 class="config-section-title">Banco de Dados</h3>
-            <div class="form-row">
-              <label class="form-label" for="cfg_SPRING_DATASOURCE_URL">
-                URL do Banco
-                <span class="form-hint">jdbc:sqlite:./data/javos.db ou jdbc:mysql://...</span>
-              </label>
-              <input class="form-input" type="text" id="cfg_SPRING_DATASOURCE_URL"
-                name="SPRING_DATASOURCE_URL" placeholder="jdbc:sqlite:./data/javos.db" />
+
+            <!-- Seletor visual de tipo de banco -->
+            <div class="db-selector" id="dbSelector" role="radiogroup" aria-label="Tipo de banco de dados">
+              <div class="db-selector-card active" data-db="sqlite" role="radio" tabindex="0" aria-checked="true">
+                <span class="db-icon">🗄</span>
+                <span class="db-name">SQLite</span>
+                <span class="db-desc">Local · sem servidor</span>
+              </div>
+              <div class="db-selector-card" data-db="mysql" role="radio" tabindex="0" aria-checked="false">
+                <span class="db-icon">🐬</span>
+                <span class="db-name">MySQL</span>
+                <span class="db-desc">Rede · multi-usuário</span>
+              </div>
+              <div class="db-selector-card" data-db="postgresql" role="radio" tabindex="0" aria-checked="false">
+                <span class="db-icon">🐘</span>
+                <span class="db-name">PostgreSQL</span>
+                <span class="db-badge">Em breve</span>
+              </div>
+              <div class="db-selector-card" data-db="sqlserver" role="radio" tabindex="0" aria-checked="false">
+                <span class="db-icon">🪟</span>
+                <span class="db-name">SQL Server</span>
+                <span class="db-badge">Em breve</span>
+              </div>
             </div>
-            <div class="form-row">
-              <label class="form-label" for="cfg_SPRING_DATASOURCE_DRIVER_CLASS_NAME">
-                Driver JDBC
-              </label>
-              <input class="form-input" type="text" id="cfg_SPRING_DATASOURCE_DRIVER_CLASS_NAME"
-                name="SPRING_DATASOURCE_DRIVER_CLASS_NAME" placeholder="org.sqlite.JDBC" />
+
+            <!-- Campos: SQLite -->
+            <div id="dbFieldsSqlite" class="db-fields">
+              <div class="form-row">
+                <label class="form-label" for="db_sqlite_path">
+                  Caminho do arquivo
+                  <span class="form-hint">Relativo ao diretório da aplicação no container</span>
+                </label>
+                <div class="input-validated">
+                  <input class="form-input" type="text" id="db_sqlite_path"
+                    placeholder="./data/javos.db" />
+                  <span class="vi" id="vi_sqlite_path"></span>
+                </div>
+              </div>
             </div>
-            <div class="form-row">
-              <label class="form-label" for="cfg_SPRING_DATASOURCE_USERNAME">
-                Usuário do Banco
-              </label>
-              <input class="form-input" type="text" id="cfg_SPRING_DATASOURCE_USERNAME"
-                name="SPRING_DATASOURCE_USERNAME" placeholder="(vazio para SQLite)" />
+
+            <!-- Campos: Banco remoto (MySQL / PostgreSQL / SQL Server) -->
+            <div id="dbFieldsRemote" class="db-fields" style="display:none">
+              <div class="form-row">
+                <label class="form-label" for="db_host">
+                  Host
+                  <span class="form-hint">Endereço do servidor de banco de dados</span>
+                </label>
+                <div class="input-validated">
+                  <input class="form-input" type="text" id="db_host" placeholder="localhost" />
+                  <span class="vi" id="vi_db_host"></span>
+                </div>
+              </div>
+              <div class="form-row">
+                <label class="form-label" for="db_port">Porta</label>
+                <div class="input-validated">
+                  <input class="form-input" type="number" id="db_port"
+                    min="1" max="65535" placeholder="3306" />
+                  <span class="vi" id="vi_db_port"></span>
+                </div>
+              </div>
+              <div class="form-row">
+                <label class="form-label" for="db_dbname">Nome do Banco</label>
+                <div class="input-validated">
+                  <input class="form-input" type="text" id="db_dbname" placeholder="javos" />
+                  <span class="vi" id="vi_db_dbname"></span>
+                </div>
+              </div>
+              <div class="form-row">
+                <label class="form-label" for="db_username">Usuário</label>
+                <input class="form-input" type="text" id="db_username" placeholder="javos_user" />
+              </div>
+              <div class="form-row">
+                <label class="form-label" for="db_password">Senha</label>
+                <input class="form-input" type="password" id="db_password" placeholder="••••••••" />
+              </div>
             </div>
-            <div class="form-row">
-              <label class="form-label" for="cfg_SPRING_DATASOURCE_PASSWORD">
-                Senha do Banco
+
+            <!-- URL JDBC (somente leitura — gerada automaticamente) -->
+            <div class="form-row db-url-row">
+              <label class="form-label">
+                URL JDBC
+                <span class="form-hint">Gerada automaticamente com base nos campos acima</span>
               </label>
-              <input class="form-input" type="password" id="cfg_SPRING_DATASOURCE_PASSWORD"
-                name="SPRING_DATASOURCE_PASSWORD" placeholder="(vazio para SQLite)" />
+              <input class="form-input db-url-input" type="text" id="db_url_preview"
+                readonly aria-readonly="true" />
             </div>
-            <div class="form-row">
-              <label class="form-label" for="cfg_SPRING_JPA_DATABASE_PLATFORM">
-                Dialeto JPA
-              </label>
-              <input class="form-input" type="text" id="cfg_SPRING_JPA_DATABASE_PLATFORM"
-                name="SPRING_JPA_DATABASE_PLATFORM"
-                placeholder="org.hibernate.community.dialect.SQLiteDialect" />
+
+            <!-- Testar conexão -->
+            <div class="db-test-row">
+              <button type="button" class="btn btn-sm btn-ghost" id="btnTestConnection">
+                🔌 Testar Conexão
+              </button>
+              <span class="test-status" id="testConnectionStatus"></span>
             </div>
           </div>
 
@@ -232,6 +292,9 @@
             <button type="button" class="btn btn-ghost" id="btnConfigReload">
               ↺ Recarregar
             </button>
+            <button type="button" class="btn btn-ghost" id="btnRestoreDefaults">
+              ⟲ Restaurar Padrão
+            </button>
             <button type="submit" class="btn btn-primary" id="btnConfigSave">
               💾 Salvar Configurações
             </button>
@@ -239,6 +302,15 @@
         </form>
 
         <div class="config-save-msg" id="configSaveMsg" style="display:none"></div>
+
+        <!-- Aviso de reinicialização necessária -->
+        <div class="restart-notice" id="restartNotice" style="display:none">
+          <span class="notice-icon">↺</span>
+          <span>Configurações salvas. Reinicie os serviços para aplicar as mudanças.</span>
+          <button type="button" class="btn btn-sm btn-warning" id="btnRestartNow">
+            ↺ Reiniciar Agora
+          </button>
+        </div>
       </div>
     </section>
 

@@ -834,4 +834,153 @@ body {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .db-selector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---- DB Type Selector ---- */
+.db-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.db-selector-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+  text-align: center;
+  outline: none;
+}
+
+.db-selector-card:hover {
+  border-color: var(--accent-blue);
+  background: var(--bg-hover);
+}
+
+.db-selector-card:focus-visible {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(91, 141, 238, 0.3);
+}
+
+.db-selector-card.active {
+  border-color: var(--accent-blue);
+  background: rgba(91, 141, 238, 0.1);
+}
+
+.db-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.db-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.db-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.db-badge {
+  font-size: 9px;
+  color: var(--accent-yellow);
+  background: rgba(210, 153, 34, 0.15);
+  border: 1px solid rgba(210, 153, 34, 0.3);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ---- Inline Validation ---- */
+.input-validated {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-validated .form-input {
+  flex: 1;
+}
+
+.vi {
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.vi.ok  { color: var(--accent-green); }
+.vi.err { color: var(--accent-red); }
+
+/* ---- DB URL Preview ---- */
+.db-url-row {
+  margin-top: 4px;
+}
+
+.db-url-input {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary) !important;
+  cursor: default;
+}
+
+/* ---- Test Connection ---- */
+.db-test-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.test-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.test-status.ok   { color: var(--accent-green); }
+.test-status.err  { color: var(--accent-red); }
+.test-status.warn { color: var(--accent-yellow); }
+
+/* ---- Config Header Actions ---- */
+.config-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---- Restart Notice ---- */
+.restart-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(210, 153, 34, 0.1);
+  border: 1px solid rgba(210, 153, 34, 0.35);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--accent-yellow);
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.restart-notice .btn {
+  margin-left: auto;
+  flex-shrink: 0;
 }
