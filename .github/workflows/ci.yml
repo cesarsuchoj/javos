@@ -37,6 +37,7 @@ jobs:
   frontend-tests:
     name: Frontend Tests (React Testing Library + Coverage)
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: [ubuntu-latest, x64]
