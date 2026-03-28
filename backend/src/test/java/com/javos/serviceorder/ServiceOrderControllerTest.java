@@ -176,8 +176,10 @@ class ServiceOrderControllerTest extends BaseIntegrationTest {
         mockMvc.perform(delete(BASE_URL + "/" + id).header("Authorization", bearerToken()))
                 .andExpect(status().isNoContent());
 
+        // Soft-delete: order remains in DB with status=CANCELLED; GET still returns 200
         mockMvc.perform(get(BASE_URL + "/" + id).header("Authorization", bearerToken()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANCELLED"));
     }
 
     @Test
