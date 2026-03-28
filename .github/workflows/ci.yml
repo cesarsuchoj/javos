@@ -38,7 +38,13 @@ jobs:
     name: Frontend Tests (React Testing Library + Coverage)
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: [ubuntu-latest, x64]
+            os-name: ubuntu-latest
+          - os: [windows-latest, x64]
+            os-name: windows-latest
+          - os: [macos-latest, x64]
+            os-name: macos-latest
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -64,6 +70,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-coverage-report-${{ matrix.os }}
+          name: frontend-coverage-report-${{ matrix.os-name }}
           path: frontend/coverage/
           retention-days: 14
