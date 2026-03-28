@@ -7,9 +7,10 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-package com.javos.product;
+package com.javos.sale;
 
 import com.javos.BaseIntegrationTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
@@ -17,22 +18,34 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Integration tests for /api/v1/products endpoints.
+ * Integration tests for /api/v1/sales endpoints.
  */
-class ProductControllerTest extends BaseIntegrationTest {
+class SaleControllerTest extends BaseIntegrationTest {
 
-    private static final String BASE_URL = "/api/v1/products";
+    private static final String BASE_URL = "/api/v1/sales";
 
-    private String productJson(String name, String code) {
+    private long clientId;
+
+    @BeforeEach
+    void createClient() throws Exception {
+        String result = mockMvc.perform(post("/api/v1/clients")
+                        .header("Authorization", bearerToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Sale Client","active":true}
+                                """))
+                .andReturn().getResponse().getContentAsString();
+        clientId = objectMapper.readTree(result).get("id").asLong();
+    }
+
+    private String saleJson() {
         return """
                 {
-                  "name": "%s",
-                  "code": "%s",
-                  "type": "PRODUCT",
-                  "price": 99.99,
-                  "active": true
+                  "clientId": %d,
+                  "status": "OPEN",
+                  "discount": 0
                 }
-                """.formatted(name, code);
+                """.formatted(clientId);
     }
 
     @Test
@@ -53,63 +66,84 @@ class ProductControllerTest extends BaseIntegrationTest {
         mockMvc.perform(post(BASE_URL)
                         .header("Authorization", bearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(productJson("Laptop Pro", "LAPTP001")))
+                        .content(saleJson()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNumber())
-                .andExpect(jsonPath("$.name").value("Laptop Pro"))
-                .andExpect(jsonPath("$.type").value("PRODUCT"));
+                .andExpect(jsonPath("$.saleNumber").isString())
+                .andExpect(jsonPath("$.status").value("OPEN"));
     }
 
     @Test
-    void create_withMissingRequiredFields_returns400() throws Exception {
+    void create_withMissingClientId_returns400() throws Exception {
         mockMvc.perform(post(BASE_URL)
                         .header("Authorization", bearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name":"incomplete","active":true}
+                                {"status":"OPEN"}
                                 """))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void findById_existingProduct_returns200() throws Exception {
+    void findById_existingSale_returns200() throws Exception {
         String result = mockMvc.perform(post(BASE_URL)
                         .header("Authorization", bearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(productJson("Mouse Wireless", "MOUSE001")))
+                        .content(saleJson()))
                 .andReturn().getResponse().getContentAsString();
 
         long id = objectMapper.readTree(result).get("id").asLong();
 
         mockMvc.perform(get(BASE_URL + "/" + id).header("Authorization", bearerToken()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Mouse Wireless"));
+                .andExpect(jsonPath("$.id").value(id));
     }
 
     @Test
-    void findById_nonExistingProduct_returns404() throws Exception {
+    void findById_nonExistingSale_returns404() throws Exception {
         mockMvc.perform(get(BASE_URL + "/999999").header("Authorization", bearerToken()))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    void findByCode_existingCode_returns200() throws Exception {
-        mockMvc.perform(post(BASE_URL)
-                        .header("Authorization", bearerToken())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(productJson("Keyboard USB", "KB-USB-002")));
-
-        mockMvc.perform(get(BASE_URL + "/code/KB-USB-002").header("Authorization", bearerToken()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("KB-USB-002"));
-    }
-
-    @Test
-    void update_existingProduct_returns200() throws Exception {
+    void changeStatus_validStatus_returns200() throws Exception {
         String result = mockMvc.perform(post(BASE_URL)
                         .header("Authorization", bearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(productJson("Old Name", "UPD-001")))
+                        .content(saleJson()))
+                .andReturn().getResponse().getContentAsString();
+
+        long id = objectMapper.readTree(result).get("id").asLong();
+
+        mockMvc.perform(patch(BASE_URL + "/" + id + "/status")
+                        .header("Authorization", bearerToken())
+                        .param("status", "CONFIRMED"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CONFIRMED"));
+    }
+
+    @Test
+    void changeStatus_invalidStatus_returns400() throws Exception {
+        String result = mockMvc.perform(post(BASE_URL)
+                        .header("Authorization", bearerToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(saleJson()))
+                .andReturn().getResponse().getContentAsString();
+
+        long id = objectMapper.readTree(result).get("id").asLong();
+
+        mockMvc.perform(patch(BASE_URL + "/" + id + "/status")
+                        .header("Authorization", bearerToken())
+                        .param("status", "INVALID_STATUS"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void update_existingSale_returns200() throws Exception {
+        String result = mockMvc.perform(post(BASE_URL)
+                        .header("Authorization", bearerToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(saleJson()))
                 .andReturn().getResponse().getContentAsString();
 
         long id = objectMapper.readTree(result).get("id").asLong();
@@ -117,17 +151,24 @@ class ProductControllerTest extends BaseIntegrationTest {
         mockMvc.perform(put(BASE_URL + "/" + id)
                         .header("Authorization", bearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(productJson("New Name", "UPD-001")))
+                        .content("""
+                                {
+                                  "clientId": %d,
+                                  "status": "CONFIRMED",
+                                  "notes": "Updated notes",
+                                  "discount": 10.00
+                                }
+                                """.formatted(clientId)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("New Name"));
+                .andExpect(jsonPath("$.status").value("CONFIRMED"));
     }
 
     @Test
-    void delete_existingProduct_returns204() throws Exception {
+    void delete_existingSale_returns204AndSaleIsCancelled() throws Exception {
         String result = mockMvc.perform(post(BASE_URL)
                         .header("Authorization", bearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(productJson("Product To Delete", "DEL-001")))
+                        .content(saleJson()))
                 .andReturn().getResponse().getContentAsString();
 
         long id = objectMapper.readTree(result).get("id").asLong();
@@ -135,17 +176,9 @@ class ProductControllerTest extends BaseIntegrationTest {
         mockMvc.perform(delete(BASE_URL + "/" + id).header("Authorization", bearerToken()))
                 .andExpect(status().isNoContent());
 
-        // Soft-delete: product remains in DB with active=false; GET still returns 200
+        // Sale is soft-deleted (status set to CANCELLED), so it still exists
         mockMvc.perform(get(BASE_URL + "/" + id).header("Authorization", bearerToken()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.active").value(false));
-    }
-
-    @Test
-    void findAll_searchByName_returns200() throws Exception {
-        mockMvc.perform(get(BASE_URL).param("name", "Mouse")
-                        .header("Authorization", bearerToken()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$.status").value("CANCELLED"));
     }
 }

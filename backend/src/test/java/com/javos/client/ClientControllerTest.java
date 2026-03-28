@@ -27,7 +27,6 @@ class ClientControllerTest extends BaseIntegrationTest {
         return """
                 {
                   "name": "%s",
-                  "email": "client@example.com",
                   "phone": "11999990000",
                   "document": "12345678901",
                   "active": true
@@ -125,8 +124,10 @@ class ClientControllerTest extends BaseIntegrationTest {
         mockMvc.perform(delete(BASE_URL + "/" + id).header("Authorization", bearerToken()))
                 .andExpect(status().isNoContent());
 
+        // Soft-delete: client remains in DB with active=false; GET still returns 200
         mockMvc.perform(get(BASE_URL + "/" + id).header("Authorization", bearerToken()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(false));
     }
 
     @Test
