@@ -79,7 +79,10 @@ test.describe('Clients CRUD', () => {
     await page.locator('button', { hasText: '+ Novo Cliente' }).click();
     await expect(page.locator('[role="dialog"]')).toBeVisible();
     // Remove native HTML5 `required` so the React submit handler runs and
-    // shows the application-level validation message.
+    // shows the application-level validation message.  The `required` attribute
+    // causes the browser to block the submit event before React's handler fires,
+    // so this manipulation is intentional: we are testing React's validation
+    // layer, not the browser's built-in constraint validation.
     await page.locator('input#client-name').evaluate((el: HTMLInputElement) => {
       el.required = false;
     });

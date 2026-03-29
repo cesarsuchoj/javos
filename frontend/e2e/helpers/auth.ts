@@ -14,6 +14,9 @@ export const MOCK_USER = {
   expiresIn: 3600,
 };
 
+/** Fixed ISO timestamp used in mock API responses for deterministic test output. */
+const MOCK_TIMESTAMP = '2024-01-01T00:00:00.000Z';
+
 /**
  * Registers a mock for the login endpoint so no real backend is required.
  * Calls to POST /api/v1/auth/login with valid credentials return a 200,
@@ -28,7 +31,7 @@ export async function mockLoginEndpoint(page: Page): Promise<void> {
       route.fulfill({
         status: 401,
         contentType: 'application/json',
-        body: JSON.stringify({ status: 401, message: 'Unauthorized', timestamp: new Date().toISOString() }),
+        body: JSON.stringify({ status: 401, message: 'Unauthorized', timestamp: MOCK_TIMESTAMP }),
       });
     }
   });
