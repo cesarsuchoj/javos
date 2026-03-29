@@ -38,13 +38,33 @@ spring:
     baseline-on-migrate: true
 
 # ----------------------------------------------------------
-# Segurança JWT
+# Segurança JWT / CORS / Rate Limiting
 # ----------------------------------------------------------
 javos:
   jwt:
     secret: ${JWT_SECRET:javos-default-secret-key-change-in-production-must-be-at-least-256-bits}
     expiration-ms: 86400000  # 24 horas
     refresh-token-expiry-days: ${JWT_REFRESH_TOKEN_EXPIRY_DAYS:7}  # 7 dias
+
+  # CORS – use CORS_ALLOWED_ORIGINS=https://app.example.com in production
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
+    allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,PATCH,DELETE,OPTIONS}
+    allowed-headers: ${CORS_ALLOWED_HEADERS:*}
+    exposed-headers: X-Correlation-Id
+    max-age: ${CORS_MAX_AGE:3600}
+
+  # Rate limiting (token-bucket, per client IP)
+  rate-limit:
+    enabled: ${RATE_LIMIT_ENABLED:true}
+    # General API: 100 requests / 60 s per IP
+    api-capacity: ${RATE_LIMIT_API_CAPACITY:100}
+    api-refill-tokens: ${RATE_LIMIT_API_REFILL_TOKENS:100}
+    api-refill-duration-seconds: ${RATE_LIMIT_API_REFILL_DURATION_SECONDS:60}
+    # Auth endpoints: 10 requests / 60 s per IP (brute-force protection)
+    auth-capacity: ${RATE_LIMIT_AUTH_CAPACITY:10}
+    auth-refill-tokens: ${RATE_LIMIT_AUTH_REFILL_TOKENS:10}
+    auth-refill-duration-seconds: ${RATE_LIMIT_AUTH_REFILL_DURATION_SECONDS:60}
 
 # ----------------------------------------------------------
 # Servidor

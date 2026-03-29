@@ -50,7 +50,7 @@ public abstract class BaseIntegrationTest {
                   "username": "testadmin",
                   "email": "testadmin@javos.test",
                   "name": "Test Admin",
-                  "password": "adminpass123"
+                  "password": "AdminPass123"
                 }
                 """;
         mockMvc.perform(post("/api/v1/auth/register")
@@ -59,7 +59,7 @@ public abstract class BaseIntegrationTest {
 
         // Log in to get token
         String loginBody = """
-                {"username":"testadmin","password":"adminpass123"}
+                {"username":"testadmin","password":"AdminPass123"}
                 """;
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

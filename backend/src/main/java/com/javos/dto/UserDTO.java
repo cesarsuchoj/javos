@@ -12,6 +12,7 @@ package com.javos.dto;
 import com.javos.model.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,7 @@ public class UserDTO {
 
     @NotBlank(message = "Username é obrigatório")
     @Size(min = 3, max = 50, message = "Username deve ter entre 3 e 50 caracteres")
+    @Pattern(regexp = "^[a-zA-Z0-9._-]+$", message = "Username deve conter apenas letras, números, '.', '_' ou '-'")
     private String username;
 
     @NotBlank(message = "Email é obrigatório")
@@ -41,7 +43,7 @@ public class UserDTO {
     @Size(max = 100)
     private String name;
 
-    @Size(min = 8, message = "Password deve ter ao menos 8 caracteres")
+    @Size(min = 8, max = 128, message = "Password deve ter entre 8 e 128 caracteres")
     private String password;
 
     private Role role;

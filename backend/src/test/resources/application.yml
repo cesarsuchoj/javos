@@ -19,6 +19,8 @@ javos:
     secret: test-secret-key-for-testing-purposes-only-must-be-long-enough
     expiration-ms: 3600000
     refresh-token-expiry-days: 1
+  rate-limit:
+    enabled: false
 
 springdoc:
   api-docs:

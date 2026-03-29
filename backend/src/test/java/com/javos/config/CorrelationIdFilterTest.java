@@ -28,7 +28,7 @@ class CorrelationIdFilterTest extends BaseIntegrationTest {
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"username":"testadmin","password":"adminpass123"}
+                                {"username":"testadmin","password":"AdminPass123"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(header().exists(CorrelationIdFilter.CORRELATION_ID_HEADER));
@@ -42,7 +42,7 @@ class CorrelationIdFilterTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(CorrelationIdFilter.CORRELATION_ID_HEADER, correlationId)
                         .content("""
-                                {"username":"testadmin","password":"adminpass123"}
+                                {"username":"testadmin","password":"AdminPass123"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(header().string(CorrelationIdFilter.CORRELATION_ID_HEADER, correlationId));

@@ -64,7 +64,7 @@ class AuthServiceRegisterTest {
                 .username("newuser")
                 .email("newuser@example.com")
                 .name("New User")
-                .password("password123")
+                .password("Password123")
                 .build();
 
         savedUser = User.builder()
@@ -81,7 +81,7 @@ class AuthServiceRegisterTest {
     void register_newUser_returnsUserDTO() {
         when(userRepository.existsByUsername("newuser")).thenReturn(false);
         when(userRepository.existsByEmail("newuser@example.com")).thenReturn(false);
-        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
+        when(passwordEncoder.encode("Password123")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         UserDTO result = authService.register(registerRequest);
@@ -91,7 +91,7 @@ class AuthServiceRegisterTest {
         assertThat(result.getName()).isEqualTo("New User");
         assertThat(result.getRole()).isEqualTo(Role.ROLE_USER);
         assertThat(result.isActive()).isTrue();
-        verify(passwordEncoder).encode("password123");
+        verify(passwordEncoder).encode("Password123");
         verify(userRepository).save(any(User.class));
     }
 
@@ -122,7 +122,7 @@ class AuthServiceRegisterTest {
     void register_passwordIsEncoded() {
         when(userRepository.existsByUsername(anyString())).thenReturn(false);
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(passwordEncoder.encode("password123")).thenReturn("$2a$encoded");
+        when(passwordEncoder.encode("Password123")).thenReturn("$2a$encoded");
         when(userRepository.save(any(User.class))).thenAnswer(inv -> {
             User u = inv.getArgument(0);
             assertThat(u.getPassword()).isEqualTo("$2a$encoded");
@@ -131,6 +131,6 @@ class AuthServiceRegisterTest {
 
         authService.register(registerRequest);
 
-        verify(passwordEncoder).encode("password123");
+        verify(passwordEncoder).encode("Password123");
     }
 }

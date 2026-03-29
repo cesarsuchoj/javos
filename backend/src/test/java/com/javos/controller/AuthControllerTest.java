@@ -26,7 +26,7 @@ class AuthControllerTest extends BaseIntegrationTest {
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"username":"testadmin","password":"adminpass123"}
+                                {"username":"testadmin","password":"AdminPass123"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty())
@@ -65,7 +65,7 @@ class AuthControllerTest extends BaseIntegrationTest {
                                   "username": "testadmin",
                                   "email": "other@javos.test",
                                   "name": "Other User",
-                                  "password": "password123"
+                                  "password": "Password123"
                                 }
                                 """))
                 .andExpect(status().isConflict());
@@ -92,7 +92,7 @@ class AuthControllerTest extends BaseIntegrationTest {
         String loginResult = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"username":"testadmin","password":"adminpass123"}
+                                {"username":"testadmin","password":"AdminPass123"}
                                 """))
                 .andReturn()
                 .getResponse()
@@ -112,7 +112,7 @@ class AuthControllerTest extends BaseIntegrationTest {
         String loginResult = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"username":"testadmin","password":"adminpass123"}
+                                {"username":"testadmin","password":"AdminPass123"}
                                 """))
                 .andReturn()
                 .getResponse()

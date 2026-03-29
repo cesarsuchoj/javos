@@ -67,13 +67,13 @@ class UserControllerTest {
                           "username": "regularuser403",
                           "email": "regularuser403@javos.test",
                           "name": "Regular User",
-                          "password": "password123"
+                          "password": "Password123"
                         }
                         """));
 
         MvcResult regularResult = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"regularuser403\",\"password\":\"password123\"}"))
+                        .content("{\"username\":\"regularuser403\",\"password\":\"Password123\"}"))
                 .andReturn();
 
         regularUserToken = objectMapper.readTree(
@@ -176,7 +176,7 @@ class UserControllerTest {
                           "username": "todelete_user",
                           "email": "todelete_user@javos.test",
                           "name": "To Delete",
-                          "password": "password123"
+                          "password": "Password123"
                         }
                         """));
 
