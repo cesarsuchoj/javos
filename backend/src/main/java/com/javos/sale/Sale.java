@@ -7,6 +7,8 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "sales")
@@ -45,6 +47,10 @@ public class Sale {
     private LocalDate saleDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "sale", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<SaleItem> items = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
