@@ -106,4 +106,44 @@ class AuthControllerTest extends BaseIntegrationTest {
                         .content("{\"refreshToken\":\"" + refreshToken + "\"}"))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    void refresh_withValidRefreshToken_returns200AndNewTokens() throws Exception {
+        String loginResult = mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"testadmin","password":"adminpass123"}
+                                """))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        String refreshToken = objectMapper.readTree(loginResult).get("refreshToken").asText();
+
+        mockMvc.perform(post("/api/v1/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"" + refreshToken + "\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").isNotEmpty())
+                .andExpect(jsonPath("$.refreshToken").isNotEmpty())
+                .andExpect(jsonPath("$.type").value("Bearer"));
+    }
+
+    @Test
+    void refresh_withInvalidRefreshToken_returns404() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"refreshToken":"invalid-refresh-token-that-does-not-exist"}
+                                """))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void refresh_withMissingRefreshToken_returns400() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+    }
 }

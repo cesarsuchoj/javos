@@ -216,4 +216,19 @@ class ServiceOrderControllerTest extends BaseIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.content").value("Customer called to check status"));
     }
+
+    @Test
+    void create_withNonExistentClientId_returns404() throws Exception {
+        mockMvc.perform(post(BASE_URL)
+                        .header("Authorization", bearerToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "clientId": 999999,
+                                  "description": "Should fail – client does not exist",
+                                  "priority": "NORMAL"
+                                }
+                                """))
+                .andExpect(status().isNotFound());
+    }
 }

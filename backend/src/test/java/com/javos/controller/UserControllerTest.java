@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for /api/v1/users endpoints.
  * Authenticates as the pre-created admin user (ROLE_ADMIN) to access
  * endpoints protected by @PreAuthorize("hasRole('ADMIN')").
+ * Also tests 403 Forbidden responses for regular (non-admin) users.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,24 +43,49 @@ class UserControllerTest {
     protected ObjectMapper objectMapper;
 
     protected String adminToken;
+    protected String regularUserToken;
 
     /**
-     * Authenticates as the pre-created admin user (username: admin, password: admin123, role: ROLE_ADMIN).
-     * This user is created by DataInitializer and has ROLE_ADMIN, allowing access to user management.
+     * Authenticates as the pre-created admin user (username: admin, password: admin123, role: ROLE_ADMIN)
+     * and also registers/logs in a regular (non-admin) user to enable 403 tests.
      */
     @BeforeEach
     void authenticate() throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
+        MvcResult adminResult = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"admin\",\"password\":\"admin123\"}"))
                 .andReturn();
 
         adminToken = objectMapper.readTree(
-                result.getResponse().getContentAsString()).get("token").asText();
+                adminResult.getResponse().getContentAsString()).get("token").asText();
+
+        // Register regular user (ignore 409 if already exists from a previous test)
+        mockMvc.perform(post("/api/v1/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                          "username": "regularuser403",
+                          "email": "regularuser403@javos.test",
+                          "name": "Regular User",
+                          "password": "password123"
+                        }
+                        """));
+
+        MvcResult regularResult = mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"regularuser403\",\"password\":\"password123\"}"))
+                .andReturn();
+
+        regularUserToken = objectMapper.readTree(
+                regularResult.getResponse().getContentAsString()).get("token").asText();
     }
 
     protected String bearerToken() {
         return "Bearer " + adminToken;
+    }
+
+    protected String regularBearerToken() {
+        return "Bearer " + regularUserToken;
     }
 
     @Test
@@ -182,5 +208,35 @@ class UserControllerTest {
     void delete_unauthenticated_returns401() throws Exception {
         mockMvc.perform(delete(BASE_URL + "/1"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    // ── 403 Forbidden – non-admin user accessing ADMIN-only endpoints ──────────
+
+    @Test
+    void findAll_asNonAdmin_returns403() throws Exception {
+        mockMvc.perform(get(BASE_URL).header("Authorization", regularBearerToken()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void update_asNonAdmin_returns403() throws Exception {
+        mockMvc.perform(put(BASE_URL + "/1")
+                        .header("Authorization", regularBearerToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "username": "hacker",
+                                  "name": "Hacker",
+                                  "email": "hacker@javos.test",
+                                  "active": true
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void delete_asNonAdmin_returns403() throws Exception {
+        mockMvc.perform(delete(BASE_URL + "/1").header("Authorization", regularBearerToken()))
+                .andExpect(status().isForbidden());
     }
 }
