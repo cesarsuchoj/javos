@@ -32,6 +32,12 @@ services:
     volumes:
       - javos-data:/app/data
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+        tag: "javos-app"
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/"]
       interval: 30s

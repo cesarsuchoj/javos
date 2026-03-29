@@ -58,7 +58,29 @@ server:
 logging:
   level:
     com.javos: INFO
+    com.javos.config: WARN
     org.springframework.security: WARN
+    org.springframework.web: WARN
+    org.hibernate: WARN
+    org.flywaydb: INFO
+
+# ----------------------------------------------------------
+# Actuator - Métricas e Monitoramento
+# ----------------------------------------------------------
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 # ----------------------------------------------------------
 # SpringDoc / Swagger UI

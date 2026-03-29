@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Javos - Logback Configuration
+  Logs em JSON estruturado (produção) via logstash-logback-encoder.
+  Em desenvolvimento (perfil "dev"), usa saída de texto legível.
+-->
+<configuration>
+
+    <!-- ============================================================ -->
+    <!-- Appender: Console em JSON (produção)                         -->
+    <!-- ============================================================ -->
+    <springProfile name="!dev">
+        <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <includeCallerData>false</includeCallerData>
+                <fieldNames>
+                    <timestamp>timestamp</timestamp>
+                    <message>message</message>
+                    <logger>logger</logger>
+                    <thread>thread</thread>
+                    <level>level</level>
+                    <levelValue>[ignore]</levelValue>
+                    <version>[ignore]</version>
+                </fieldNames>
+                <!-- Inclui MDC (correlation-id, etc.) automaticamente -->
+                <includeMdcKeyName>correlationId</includeMdcKeyName>
+                <includeMdcKeyName>userId</includeMdcKeyName>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE_JSON"/>
+        </root>
+    </springProfile>
+
+    <!-- ============================================================ -->
+    <!-- Appender: Console em texto (desenvolvimento)                 -->
+    <!-- ============================================================ -->
+    <springProfile name="dev">
+        <appender name="CONSOLE_TEXT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%X{correlationId}] - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE_TEXT"/>
+        </root>
+    </springProfile>
+
+    <!-- ============================================================ -->
+    <!-- Níveis de log por módulo                                     -->
+    <!-- ============================================================ -->
+    <logger name="com.javos" level="INFO"/>
+    <logger name="com.javos.config" level="WARN"/>
+
+    <!-- Reduz verbosidade de frameworks -->
+    <logger name="org.springframework.security" level="WARN"/>
+    <logger name="org.springframework.web" level="WARN"/>
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.flywaydb" level="INFO"/>
+
+</configuration>
