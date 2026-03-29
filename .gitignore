@@ -442,6 +442,9 @@ yarn-error.log*
 # ============================================================
 frontend/dist/
 backend/src/main/resources/static/
+frontend/playwright-report/
+frontend/test-results/
+frontend/coverage/
 
 # ============================================================
 # SQLite database files
