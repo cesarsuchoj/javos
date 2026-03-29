@@ -38,10 +38,13 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       const refreshToken = useAuthStore.getState().refreshToken
 
-      // No refresh token available – go to login
+      // No refresh token available – go to login (skip redirect for auth endpoints
+      // so callers like the Login component can display the error themselves)
       if (!refreshToken) {
-        useAuthStore.getState().logout()
-        window.location.href = '/login'
+        if (!originalRequest.url?.includes('/v1/auth/')) {
+          useAuthStore.getState().logout()
+          window.location.href = '/login'
+        }
         return Promise.reject(error)
       }
 
