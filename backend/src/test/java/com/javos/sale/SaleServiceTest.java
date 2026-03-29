@@ -101,7 +101,6 @@ class SaleServiceTest {
     @Test
     void findAll_returnsAllSales() {
         when(saleRepository.findAll()).thenReturn(List.of(sale));
-        when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of());
 
         List<SaleResponse> result = saleService.findAll();
 
@@ -123,7 +122,6 @@ class SaleServiceTest {
     @Test
     void findById_existingId_returnsSale() {
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
-        when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of());
 
         SaleResponse result = saleService.findById(1L);
 
@@ -148,7 +146,6 @@ class SaleServiceTest {
         when(userRepository.findById(2L)).thenReturn(Optional.of(seller));
         when(saleRepository.count()).thenReturn(0L);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
-        when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of());
 
         SaleResponse result = saleService.create(request);
 
@@ -176,7 +173,6 @@ class SaleServiceTest {
         when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
         when(saleRepository.count()).thenReturn(0L);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
-        when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of());
 
         saleService.create(request);
 
@@ -190,7 +186,6 @@ class SaleServiceTest {
         when(userRepository.findById(2L)).thenReturn(Optional.of(seller));
         when(saleRepository.count()).thenReturn(0L);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
-        when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of());
 
         saleService.create(request);
 
@@ -204,7 +199,6 @@ class SaleServiceTest {
         when(userRepository.findById(2L)).thenReturn(Optional.of(seller));
         when(saleRepository.count()).thenReturn(0L);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
-        when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of());
 
         saleService.create(request);
 
@@ -290,7 +284,6 @@ class SaleServiceTest {
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
         when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
         when(saleRepository.save(any(Sale.class))).thenReturn(updated);
-        when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of());
 
         SaleResponse result = saleService.update(1L, updateRequest);
 
@@ -319,7 +312,6 @@ class SaleServiceTest {
 
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
         when(saleRepository.save(any(Sale.class))).thenReturn(confirmed);
-        when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of());
 
         SaleResponse result = saleService.changeStatus(1L, SaleStatus.CONFIRMED);
 

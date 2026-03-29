@@ -83,7 +83,7 @@ public class SaleService {
     private Sale getSale(Long id) { return saleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sale not found: " + id)); }
 
     private SaleResponse toResponse(Sale sale) {
-        List<SaleItemResponse> items = saleItemRepository.findBySaleId(sale.getId()).stream().map(this::toItemResponse).collect(Collectors.toList());
+        List<SaleItemResponse> items = sale.getItems().stream().map(this::toItemResponse).collect(Collectors.toList());
         return SaleResponse.builder().id(sale.getId()).saleNumber(sale.getSaleNumber()).clientId(sale.getClient() != null ? sale.getClient().getId() : null).clientName(sale.getClient() != null ? sale.getClient().getName() : null).sellerId(sale.getSeller() != null ? sale.getSeller().getId() : null).sellerName(sale.getSeller() != null ? sale.getSeller().getName() : null).status(sale.getStatus()).totalAmount(sale.getTotalAmount()).discount(sale.getDiscount()).notes(sale.getNotes()).saleDate(sale.getSaleDate()).items(items).createdAt(sale.getCreatedAt()).updatedAt(sale.getUpdatedAt()).build();
     }
     private SaleItemResponse toItemResponse(SaleItem item) { return SaleItemResponse.builder().id(item.getId()).productId(item.getProduct() != null ? item.getProduct().getId() : null).productName(item.getProduct() != null ? item.getProduct().getName() : null).quantity(item.getQuantity()).unitPrice(item.getUnitPrice()).discount(item.getDiscount()).totalPrice(item.getTotalPrice()).build(); }

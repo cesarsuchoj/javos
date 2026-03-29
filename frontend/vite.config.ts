@@ -19,6 +19,15 @@ export default defineConfig({
     // To build locally without integration, set VITE_OUT_DIR=dist.
     outDir: '../backend/src/main/resources/static',
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          state: ['zustand'],
+          http: ['axios'],
+        },
+      },
+    },
   },
   test: {
     environment: 'jsdom',
