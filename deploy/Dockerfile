@@ -14,10 +14,10 @@ COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
 # Build estático vai para dist/ no WORKDIR
-RUN npm run build --outDir=dist
+RUN npm run build -- --outDir=dist
 
 # ---- Stage 2: Build do Backend ----
-FROM eclipse-temurin:17-jdk-alpine AS backend-builder
+FROM eclipse-temurin:21-jdk-alpine AS backend-builder
 
 WORKDIR /app/backend
 COPY backend/pom.xml ./
@@ -30,7 +30,7 @@ RUN apk add --no-cache maven && \
     mvn package -DskipTests --no-transfer-progress
 
 # ---- Stage 3: Imagem final ----
-FROM eclipse-temurin:17-jre-alpine AS production
+FROM eclipse-temurin:21-jre-alpine AS production
 
 LABEL maintainer="Javos Contributors"
 LABEL description="Javos - Sistema de gestão open-source"
