@@ -1,0 +1,39 @@
+# ============================================================
+# Javos - Configurações de produção (perfil: prod)
+# ============================================================
+# Ativo quando SPRING_PROFILES_ACTIVE=prod
+# Sobrescreve valores do application.yml
+# ============================================================
+
+# ----------------------------------------------------------
+# Logging: apenas erros de frameworks externos
+# O logback-spring.xml usa JSON em produção automaticamente
+# ----------------------------------------------------------
+logging:
+  level:
+    com.javos: INFO
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+    org.hibernate: WARN
+    org.flywaydb: INFO
+
+# ----------------------------------------------------------
+# Actuator: expõe detalhes de saúde internamente
+# O nginx restringe /actuator/** somente via rede interna
+# ----------------------------------------------------------
+management:
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+# ----------------------------------------------------------
+# JPA: desabilita SQL no console em produção
+# ----------------------------------------------------------
+spring:
+  jpa:
+    show-sql: false
