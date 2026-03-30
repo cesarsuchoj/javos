@@ -23,10 +23,12 @@ public class ServiceOrderService {
     private final ClientRepository clientRepository;
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public List<ServiceOrderResponse> findAll() {
         return serviceOrderRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public ServiceOrderResponse findById(Long id) {
         return toResponse(getServiceOrder(id));
     }
@@ -108,6 +110,7 @@ public class ServiceOrderService {
         return toNoteResponse(osNoteRepository.save(note));
     }
 
+    @Transactional(readOnly = true)
     public List<OsNoteResponse> getNotes(Long serviceOrderId) {
         return osNoteRepository.findByServiceOrderIdOrderByCreatedAtAsc(serviceOrderId)
                 .stream().map(this::toNoteResponse).collect(Collectors.toList());

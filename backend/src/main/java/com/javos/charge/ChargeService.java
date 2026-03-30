@@ -17,7 +17,10 @@ public class ChargeService {
     private final ChargeRepository chargeRepository;
     private final ClientRepository clientRepository;
 
+    @Transactional(readOnly = true)
     public List<ChargeResponse> findAll() { return chargeRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList()); }
+
+    @Transactional(readOnly = true)
     public ChargeResponse findById(Long id) { return toResponse(getCharge(id)); }
 
     @Transactional

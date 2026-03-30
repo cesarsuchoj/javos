@@ -15,10 +15,12 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
 
+    @Transactional(readOnly = true)
     public List<ClientResponse> findAll() {
         return clientRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public ClientResponse findById(Long id) {
         return toResponse(getClient(id));
     }
@@ -63,10 +65,12 @@ public class ClientService {
         clientRepository.save(client);
     }
 
+    @Transactional(readOnly = true)
     public List<ClientResponse> searchByName(String name) {
         return clientRepository.findByNameContainingIgnoreCase(name).stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<ClientResponse> searchByDocument(String document) {
         return clientRepository.findByDocumentContaining(document).stream().map(this::toResponse).collect(Collectors.toList());
     }

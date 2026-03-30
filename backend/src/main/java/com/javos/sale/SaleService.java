@@ -26,9 +26,12 @@ public class SaleService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
+    @Transactional(readOnly = true)
     public List<SaleResponse> findAll() {
         return saleRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
     public SaleResponse findById(Long id) { return toResponse(getSale(id)); }
 
     @Transactional

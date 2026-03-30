@@ -10,7 +10,9 @@
 package com.javos.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -56,6 +58,23 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST.value(), "Erro de validação");
         response.setDetails(errors);
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler({DataIntegrityViolationException.class, JpaSystemException.class})
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(RuntimeException ex) {
+        Throwable cause = ex.getCause();
+        while (cause != null && cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        String causeMsg = cause != null ? cause.getMessage() : ex.getMessage();
+        if (causeMsg != null && causeMsg.toUpperCase().contains("CONSTRAINT")) {
+            log.warn("Data integrity violation: {}", causeMsg);
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(ErrorResponse.of(HttpStatus.CONFLICT.value(), "Operação viola a integridade dos dados"));
+        }
+        log.error("Erro não tratado: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro interno do servidor"));
     }
 
     @ExceptionHandler(IllegalStateException.class)
