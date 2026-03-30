@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: ["**"]
+    tags: ["v*"]
   pull_request:
     branches: ["**"]
   workflow_dispatch:
@@ -124,7 +125,7 @@ jobs:
         working-directory: backend
         run: java -jar target/javos-*.jar &
         env:
-          SPRING_DATASOURCE_URL: jdbc:sqlite::memory:
+          SPRING_DATASOURCE_URL: "jdbc:sqlite::memory:"
           SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.sqlite.JDBC
           SPRING_JPA_DATABASE_PLATFORM: org.hibernate.community.dialect.SQLiteDialect
           SPRING_FLYWAY_ENABLED: "false"
@@ -200,3 +201,186 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # ----------------------------------------------------------------
+  # Deploy to Staging
+  # Runs automatically on every push to main after tests and image
+  # build pass. Uses the GitHub Environment "staging" which can be
+  # configured with branch protection rules in repository settings.
+  #
+  # Required repository secrets (Settings → Environments → staging):
+  #   STAGING_DEPLOY_HOST     – hostname or IP of the staging server
+  #   STAGING_DEPLOY_USER     – SSH user on the staging server
+  #   STAGING_DEPLOY_SSH_KEY  – private SSH key for staging server
+  # ----------------------------------------------------------------
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    needs: [docker-build-push]
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: image
+        run: echo "tag=sha-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to staging server via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.STAGING_DEPLOY_HOST }}
+          username: ${{ secrets.STAGING_DEPLOY_USER }}
+          key: ${{ secrets.STAGING_DEPLOY_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            cd ~/javos/deploy
+
+            # Pull the new image built in docker-build-push
+            docker pull ghcr.io/${{ github.repository }}:${{ steps.image.outputs.tag }}
+
+            # Update DOCKER_IMAGE in the staging env file
+            sed -i "s|^DOCKER_IMAGE=.*|DOCKER_IMAGE=ghcr.io/${{ github.repository }}:${{ steps.image.outputs.tag }}|" .env.staging
+
+            # Recreate only the backend (zero-downtime for nginx/prometheus/grafana)
+            docker compose -f docker-compose.staging.yml --env-file .env.staging \
+              up -d --no-deps --pull never backend
+
+            echo "Waiting for backend health check..."
+            timeout 90 bash -c \
+              'until docker compose -f docker-compose.staging.yml --env-file .env.staging \
+                exec -T backend wget -qO- http://localhost:8080/actuator/health \
+                | grep -q "UP"; do sleep 5; done' \
+              || { echo "Backend health check failed"; exit 1; }
+
+      - name: Post-deploy health check (staging)
+        run: |
+          STAGING_URL="${{ vars.STAGING_URL }}"
+          if [ -z "$STAGING_URL" ]; then
+            echo "STAGING_URL not set — skipping external health check"
+            exit 0
+          fi
+          echo "Checking $STAGING_URL/actuator/health ..."
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl -sf "$STAGING_URL/actuator/health" \
+              --max-time 10 --insecure 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('status',''))" 2>/dev/null || echo "")
+            if [ "$STATUS" = "UP" ]; then
+              echo "Health check passed (attempt $i)"
+              exit 0
+            fi
+            echo "Attempt $i: status='$STATUS', retrying in 15s..."
+            sleep 15
+          done
+          echo "Post-deploy health check failed after 5 attempts"
+          exit 1
+
+  # ----------------------------------------------------------------
+  # Deploy to Production
+  # Runs on version tags (v*) or manual workflow_dispatch.
+  # Uses the GitHub Environment "production" which SHOULD be
+  # configured with at least one required reviewer in repository
+  # settings (Settings → Environments → production → Required reviewers).
+  #
+  # Required repository secrets (Settings → Environments → production):
+  #   PRODUCTION_DEPLOY_HOST    – hostname or IP of the production server
+  #   PRODUCTION_DEPLOY_USER    – SSH user on the production server
+  #   PRODUCTION_DEPLOY_SSH_KEY – private SSH key for production server
+  # ----------------------------------------------------------------
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      startsWith(github.ref, 'refs/tags/v')
+    needs: [backend-tests, frontend-tests, docker-build-push]
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: image
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=sha-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Backup database before deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.PRODUCTION_DEPLOY_HOST }}
+          username: ${{ secrets.PRODUCTION_DEPLOY_USER }}
+          key: ${{ secrets.PRODUCTION_DEPLOY_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            cd ~/javos/deploy
+            mkdir -p ~/javos/backups/pre-deploy
+            ./backup.sh ~/javos/backups/pre-deploy
+            echo "Pre-deploy backup created."
+
+      - name: Deploy to production server via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.PRODUCTION_DEPLOY_HOST }}
+          username: ${{ secrets.PRODUCTION_DEPLOY_USER }}
+          key: ${{ secrets.PRODUCTION_DEPLOY_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            cd ~/javos/deploy
+
+            # Pull the new image
+            docker pull ghcr.io/${{ github.repository }}:${{ steps.image.outputs.tag }}
+
+            # Store previous image tag for rollback reference
+            PREV_TAG=$(grep "^DOCKER_IMAGE=" .env | cut -d= -f2- || echo "")
+            echo "Previous image: $PREV_TAG"
+            echo "New image: ghcr.io/${{ github.repository }}:${{ steps.image.outputs.tag }}"
+
+            # Update .env
+            sed -i "s|^DOCKER_IMAGE=.*|DOCKER_IMAGE=ghcr.io/${{ github.repository }}:${{ steps.image.outputs.tag }}|" .env
+
+            # Recreate only the backend (zero-downtime for nginx/prometheus/grafana)
+            docker compose -f docker-compose.prod.yml up -d --no-deps --pull never backend
+
+            echo "Waiting for backend health check (up to 120s)..."
+            timeout 120 bash -c \
+              'until docker compose -f docker-compose.prod.yml \
+                exec -T backend wget -qO- http://localhost:8080/actuator/health \
+                | grep -q "UP"; do sleep 5; done' \
+              || { echo "Backend health check failed — consider rollback"; exit 1; }
+
+      - name: Post-deploy health check (production)
+        run: |
+          PRODUCTION_URL="${{ vars.PRODUCTION_URL }}"
+          if [ -z "$PRODUCTION_URL" ]; then
+            echo "PRODUCTION_URL not set — skipping external health check"
+            exit 0
+          fi
+          echo "Checking $PRODUCTION_URL/actuator/health ..."
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl -sf "$PRODUCTION_URL/actuator/health" \
+              --max-time 15 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('status',''))" 2>/dev/null || echo "")
+            if [ "$STATUS" = "UP" ]; then
+              echo "Health check passed (attempt $i)"
+              exit 0
+            fi
+            echo "Attempt $i: status='$STATUS', retrying in 20s..."
+            sleep 20
+          done
+          echo "Post-deploy health check failed after 5 attempts"
+          exit 1
