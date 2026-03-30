@@ -1,0 +1,151 @@
+# ============================================================
+# Javos - Docker Compose (Produção)
+# ============================================================
+# Configuração para ambiente de produção:
+#   - nginx como reverse proxy (HTTPS, gzip, cache headers)
+#   - Backend Spring Boot (API)
+#   - Frontend React servido pelo nginx como arquivos estáticos
+#   - Certbot para renovação automática de certificados SSL
+#   - Health checks robustos para todos os serviços
+#   - Restart policies
+#
+# PRÉ-REQUISITO: Execute ./init-ssl.sh antes de iniciar
+#
+# Para iniciar:
+#   cp .env.example .env   # edite as variáveis
+#   ./init-ssl.sh           # gera certificados SSL
+#   docker compose -f docker-compose.prod.yml up -d
+# ============================================================
+
+version: '3.9'
+
+services:
+
+  # ---- Backend Spring Boot (API) ----
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: production
+    container_name: javos-backend
+    # Sem portas expostas — acessível apenas via nginx
+    environment:
+      SERVER_PORT: 8080
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET obrigatório — defina no arquivo .env}
+      JWT_REFRESH_TOKEN_EXPIRY_DAYS: ${JWT_REFRESH_TOKEN_EXPIRY_DAYS:-7}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      # Banco de dados
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:sqlite:./data/javos.db}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:-org.sqlite.JDBC}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-}
+      SPRING_JPA_DATABASE_PLATFORM: ${SPRING_JPA_DATABASE_PLATFORM:-org.hibernate.community.dialect.SQLiteDialect}
+      # CORS — aceita apenas o domínio configurado
+      # IMPORTANTE: defina o valor explícito, ex: CORS_ALLOWED_ORIGINS=https://app.exemplo.com.br
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-*}
+      # Rate limiting
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+    volumes:
+      - javos-data:/app/data
+    networks:
+      - javos-internal
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+        tag: "javos-backend"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ---- nginx: reverse proxy + frontend estático + SSL ----
+  nginx:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: nginx-frontend
+    container_name: javos-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Certificados SSL (gerados por ./init-ssl.sh)
+      - ./ssl:/etc/nginx/ssl:ro
+      # Diretório para ACME challenge (Let's Encrypt)
+      - ./certbot/www:/var/www/certbot:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - javos-internal
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+        tag: "javos-nginx"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ---- Certbot: renovação automática de certificados Let's Encrypt ----
+  # Ativado automaticamente quando SSL_MODE=letsencrypt no .env
+  certbot:
+    image: certbot/certbot:latest
+    container_name: javos-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    # Renova os certificados a cada 12h (certbot só renova quando necessário)
+    entrypoint: >
+      /bin/sh -c "
+        trap exit TERM;
+        while :; do
+          certbot renew --webroot -w /var/www/certbot --quiet;
+          sleep 12h & wait $${!};
+        done
+      "
+    # Nota: $${!} é a sintaxe Docker Compose para escapar ${!} (PID do processo em background)
+    restart: unless-stopped
+    networks:
+      - javos-internal
+
+  # ---- MySQL (descomente para usar MySQL em vez de SQLite) ----
+  # db:
+  #   image: mysql:8.0
+  #   container_name: javos-db
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD obrigatório}
+  #     MYSQL_DATABASE: javos
+  #     MYSQL_USER: javos_user
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD obrigatório}
+  #   volumes:
+  #     - javos-mysql-data:/var/lib/mysql
+  #   networks:
+  #     - javos-internal
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 30s
+
+networks:
+  javos-internal:
+    driver: bridge
+
+volumes:
+  javos-data:
+    driver: local
+  # javos-mysql-data:
+  #   driver: local
