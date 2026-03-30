@@ -1,5 +1,6 @@
 import i18n from './index'
 
+// All monetary values use BRL regardless of UI language since this is a Brazilian management system.
 const LOCALE_MAP: Record<string, string> = {
   'pt-BR': 'pt-BR',
   en: 'en-US',

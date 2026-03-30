@@ -468,8 +468,8 @@ function AccountsSection() {
                   value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value as AccountType })}
                 >
-                  {(['CHECKING', 'SAVINGS', 'CASH', 'CREDIT_CARD'] as AccountType[]).map((accountType) => (
-                    <option key={accountType} value={accountType}>{t(`financial.accountType.${accountType}`)}</option>
+                  {(['CHECKING', 'SAVINGS', 'CASH', 'CREDIT_CARD'] as AccountType[]).map((accType) => (
+                    <option key={accType} value={accType}>{t(`financial.accountType.${accType}`)}</option>
                   ))}
                 </select>
               </div>
