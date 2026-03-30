@@ -6,6 +6,56 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e o 
 
 ---
 
+## Estratégia de Versionamento
+
+### Abordagem
+
+Esta API usa **versionamento por caminho** (`/api/v1/...`). O identificador de versão é o segundo segmento da URL (ex.: `v1`, `v2`).
+
+### Ciclo de Vida de uma Versão
+
+| Fase | Descrição |
+|------|-----------|
+| **Ativa** | Versão corrente; sem avisos de depreciação. |
+| **Depreciada** | Versão ainda funcional com headers de aviso nas respostas. |
+| **Removida** | Versão desativada após a data de *sunset*. Retorna `410 Gone`. |
+
+### Headers de Depreciação
+
+Quando uma versão está na fase **Depreciada**, todas as respostas incluem:
+
+| Header | Valor de exemplo | Descrição |
+|--------|-----------------|-----------|
+| `X-API-Version` | `v1` | Versão processou a requisição. |
+| `Deprecation` | `true` | Sinaliza depreciação (RFC 8594). |
+| `Sunset` | `Wed, 31 Dec 2026 23:59:59 GMT` | Data de remoção prevista. |
+| `Warning` | `299 - "Deprecated API version v1..."` | Mensagem de migração. |
+
+O header `X-API-Version` está presente em **todas** as respostas de `/api/**`, independentemente de depreciação.
+
+### Configuração de Depreciação
+
+Para deprecar uma versão, adicione-a em `application.yml`:
+
+```yaml
+javos:
+  api:
+    current-version: v2
+    deprecated-versions:
+      v1:
+        sunset-date: "2026-12-31"
+        message: "Please migrate to /api/v2/."
+```
+
+### Política de Breaking Changes
+
+- **Mudanças compatíveis** (campos opcionais, novos endpoints) podem ser adicionadas na versão atual (`v1`) sem incremento de versão.
+- **Breaking changes** (remoção de campos, mudança de contrato) exigem uma nova versão (ex.: `/api/v2/`).
+- A versão anterior é mantida no mínimo **6 meses** após o lançamento da nova versão antes de ser removida.
+- Avisos de depreciação são adicionados **no mínimo 3 meses** antes da data de remoção.
+
+---
+
 ## [Não lançado]
 
 ### Adicionado
@@ -13,6 +63,10 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e o 
 - Guias de autenticação, rate limiting e tratamento de erros em `docs/`
 - Coleção Postman exportada em `docs/POSTMAN_COLLECTION.json`
 - Configuração do Swagger UI com ordenação alfabética e Try-it-out habilitado
+- Filtro `ApiVersionFilter`: adiciona `X-API-Version` em todas as respostas de `/api/**`
+- Suporte a depreciação suave via headers `Deprecation`, `Sunset` e `Warning` (RFC 8594)
+- Propriedades `javos.api.current-version` e `javos.api.deprecated-versions` para gestão do ciclo de vida
+- Headers de versão/depreciação expostos via CORS para consumidores JavaScript
 
 ---
 

@@ -24,6 +24,30 @@ public class OpenApiConfig {
                                 API REST para o sistema Javos de gestão de ordens de serviço, clientes, \
                                 produtos, financeiro e vendas.
 
+                                ## Versionamento
+
+                                Esta API adota **versionamento por caminho** (`/api/v1/...`).
+
+                                - **Versão atual:** `v1`
+                                - Mudanças não-compatíveis (breaking changes) são introduzidas em uma nova \
+                                versão (ex.: `/api/v2/`).
+                                - Versões antigas são mantidas por um período de transição e \
+                                depois depreciadas *suavemente* antes da remoção.
+
+                                ### Ciclo de vida de uma versão
+
+                                | Fase | Descrição |
+                                |------|-----------|
+                                | **Ativa** | Versão atual, sem avisos. |
+                                | **Depreciada** | Versão ainda funcional, porém com headers de aviso. |
+                                | **Removida** | Versão desativada após a data de sunset. |
+
+                                Quando uma versão está depreciada, as respostas incluem:
+                                - `Deprecation: true`
+                                - `Sunset: <data de remoção no formato HTTP-date>`
+                                - `Warning: 299 - "<mensagem de migração>"`
+                                - `X-API-Version: <versão utilizada>`
+
                                 ## Autenticação
 
                                 A maioria dos endpoints requer autenticação via **JWT Bearer Token**.
