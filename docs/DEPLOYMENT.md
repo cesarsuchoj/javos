@@ -573,8 +573,8 @@ cd javos/deploy
 docker compose -f docker-compose.prod.yml up -d
 ```
 
-**RTO estimado**: 30–60 minutos  
-**RPO**: último backup (máximo 24h se backup diário configurado)
+**RTO estimado**: 30–60 minutos *(exemplo — ajuste conforme os SLAs da sua organização)*  
+**RPO**: último backup *(exemplo — máximo 24h se backup diário; ajuste a frequência conforme necessário)*
 
 #### Cenário 3: Corrupção do banco de dados
 

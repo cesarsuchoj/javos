@@ -44,7 +44,13 @@ while getopts "f:eh" opt; do
 done
 
 # ---- Verifica ambiente ----
-ENV="${SPRING_PROFILES_ACTIVE:-dev}"
+# Prioridade: variável de shell > arquivo .env no diretório do script
+ENV="${SPRING_PROFILES_ACTIVE:-}"
+if [ -z "$ENV" ] && [ -f "$SCRIPT_DIR/.env" ]; then
+    ENV=$(grep -E '^SPRING_PROFILES_ACTIVE=' "$SCRIPT_DIR/.env" | cut -d= -f2- | tr -d '"' | tr -d "'" || echo "")
+fi
+ENV="${ENV:-dev}"
+
 if [[ "$ENV" == "prod" || "$ENV" == "production" ]]; then
     echo "ERRO: O seed não deve ser executado em ambiente de produção!"
     echo "  SPRING_PROFILES_ACTIVE=$ENV"
