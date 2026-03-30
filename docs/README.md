@@ -252,6 +252,8 @@ Para instruções detalhadas de instalação, operação e solução de problema
 | 🐧 Linux (Ubuntu, Debian, Fedora e outros) | [docs/README-linux.md](README-linux.md) |
 | ❓ Perguntas Frequentes (FAQ) | [docs/FAQ.md](FAQ.md) |
 | ✅ Checklist de testes multiplataforma | [docs/CHECKLIST.md](CHECKLIST.md) |
+| 🚀 Guias de Deployment (dev, staging, prod) | [docs/DEPLOYMENT.md](DEPLOYMENT.md) |
+| 📟 Runbook de Operações (on-call) | [docs/RUNBOOK.md](RUNBOOK.md) |
 
 ---
 
