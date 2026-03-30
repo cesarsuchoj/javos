@@ -1,0 +1,43 @@
+# ============================================================
+# Prometheus - Regras de Alerta
+# ============================================================
+
+groups:
+  - name: javos-alerts
+    interval: 30s
+    rules:
+      # Alta taxa de erros HTTP (5xx)
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m]))
+          /
+          sum(rate(http_server_requests_seconds_count[5m])) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Alta taxa de erros HTTP 5xx (> 5%)"
+          description: "Taxa de erros: {{ $value | humanizePercentage }}"
+
+      # Alta latência p95 > 2s
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_server_requests_seconds_bucket[5m])) by (le, uri)
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alta latência p95 no endpoint {{ $labels.uri }}"
+          description: "Latência p95: {{ $value | humanizeDuration }}"
+
+      # Backend indisponível
+      - alert: BackendDown
+        expr: up{job="javos-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend Javos indisponível"
+          description: "O backend não está respondendo ao Prometheus há mais de 1 minuto."

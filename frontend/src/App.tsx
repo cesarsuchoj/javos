@@ -1,9 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Suspense, lazy } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Suspense, lazy, useEffect } from 'react'
 import LoginPage from './pages/LoginPage'
 import AppLayout from './pages/AppLayout'
 import PageLoader from './components/ui/PageLoader'
+import CookieConsent from './components/ui/CookieConsent'
 import { useAuthStore } from './store/authStore'
+import { analyticsService } from './services/analyticsService'
 
 const Dashboard = lazy(() => import('./components/dashboard/Dashboard'))
 const ClientsPage = lazy(() => import('./pages/ClientsPage'))
@@ -16,9 +18,19 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return token ? <>{children}</> : <Navigate to="/login" replace />
 }
 
+function PageViewTracker() {
+  const location = useLocation()
+  useEffect(() => {
+    analyticsService.trackPageView(location.pathname)
+  }, [location.pathname])
+  return null
+}
+
 function App() {
   return (
     <BrowserRouter>
+      <PageViewTracker />
+      <CookieConsent />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route
