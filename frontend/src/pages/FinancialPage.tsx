@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { formatCurrency, formatDate } from '../i18n/locale'
 import { useFinancialStore } from '../store/financialStore'
 import { useClientStore } from '../store/clientStore'
 import {
@@ -24,46 +26,6 @@ import styles from './crud.module.css'
 
 type Tab = 'charges' | 'accounts' | 'categories' | 'entries'
 
-// ── Labels ──────────────────────────────────────────────────
-const chargeStatusLabels: Record<ChargeStatus, string> = {
-  PENDING: 'Pendente',
-  SENT: 'Enviada',
-  PAID: 'Paga',
-  OVERDUE: 'Vencida',
-  CANCELLED: 'Cancelada',
-}
-
-const chargeMethodLabels: Record<ChargeMethod, string> = {
-  BOLETO: 'Boleto',
-  PIX: 'Pix',
-  CREDIT_CARD: 'Cartão de Crédito',
-  BANK_TRANSFER: 'Transferência',
-  CASH: 'Dinheiro',
-}
-
-const accountTypeLabels: Record<AccountType, string> = {
-  CHECKING: 'Conta Corrente',
-  SAVINGS: 'Poupança',
-  CASH: 'Caixa',
-  CREDIT_CARD: 'Cartão de Crédito',
-}
-
-const categoryTypeLabels: Record<CategoryType, string> = {
-  INCOME: 'Receita',
-  EXPENSE: 'Despesa',
-}
-
-const entryTypeLabels: Record<EntryType, string> = {
-  INCOME: 'Receita',
-  EXPENSE: 'Despesa',
-}
-
-const formatCurrency = (v: number | null | undefined) =>
-  (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-
-const formatDate = (d: string | null | undefined) =>
-  d ? new Date(d).toLocaleDateString('pt-BR') : '—'
-
 // ── Charges section ───────────────────────────────────────────
 const emptyCharge: ChargeRequest = {
   clientId: null,
@@ -75,6 +37,7 @@ const emptyCharge: ChargeRequest = {
 }
 
 function ChargesSection() {
+  const { t } = useTranslation()
   const { charges, loading, error, fetchCharges, createCharge, updateCharge, removeCharge, clearError } =
     useFinancialStore()
   const { clients, fetchAll: fetchClients } = useClientStore()
@@ -117,7 +80,7 @@ function ChargesSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.amount || form.amount <= 0) {
-      setFormError('Informe um valor válido.')
+      setFormError(t('financial.charges.amountRequired'))
       return
     }
     setSaving(true)
@@ -125,10 +88,10 @@ function ChargesSection() {
     try {
       if (editing) {
         await updateCharge(editing.id, form)
-        notify('success', 'Cobrança atualizada com sucesso.')
+        notify('success', t('financial.charges.updated'))
       } else {
         await createCharge(form)
-        notify('success', 'Cobrança criada com sucesso.')
+        notify('success', t('financial.charges.created'))
       }
       setModalOpen(false)
     } catch (err) {
@@ -143,7 +106,7 @@ function ChargesSection() {
     setDeleting(true)
     try {
       await removeCharge(deleteTarget.id)
-      notify('success', 'Cobrança excluída com sucesso.')
+      notify('success', t('financial.charges.deleted'))
     } catch (err) {
       notify('error', getErrorMessage(err))
     } finally {
@@ -157,7 +120,7 @@ function ChargesSection() {
       <div className={styles.pageHeader} style={{ marginBottom: '1rem' }}>
         <span />
         <button className={styles.addBtn} onClick={openCreate}>
-          + Nova Cobrança
+          {t('financial.charges.newCharge')}
         </button>
       </div>
 
@@ -167,7 +130,7 @@ function ChargesSection() {
           role={notification.type === 'error' ? 'alert' : 'status'}
         >
           {notification.message}
-          <button className={styles.notificationClose} onClick={clearNotification} aria-label="Fechar notificação">✕</button>
+          <button className={styles.notificationClose} onClick={clearNotification} aria-label={t('common.closeNotification')}>✕</button>
         </div>
       )}
 
@@ -183,26 +146,26 @@ function ChargesSection() {
       {loading ? (
         <div className={styles.loading}>
           <span className={styles.spinner} aria-hidden="true" />
-          Carregando...
+          {t('common.loading')}
         </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Cliente</th>
-                <th>Valor</th>
-                <th>Vencimento</th>
-                <th>Status</th>
-                <th>Método</th>
-                <th>Ações</th>
+                <th>{t('financial.charges.columns.client')}</th>
+                <th>{t('financial.charges.columns.amount')}</th>
+                <th>{t('financial.charges.columns.dueDate')}</th>
+                <th>{t('financial.charges.columns.status')}</th>
+                <th>{t('financial.charges.columns.method')}</th>
+                <th>{t('financial.charges.columns.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {charges.length === 0 ? (
                 <tr>
                   <td colSpan={6} className={styles.emptyState}>
-                    Nenhuma cobrança encontrada.
+                    {t('financial.charges.notFound')}
                   </td>
                 </tr>
               ) : (
@@ -213,17 +176,17 @@ function ChargesSection() {
                     <td>{formatDate(charge.dueDate)}</td>
                     <td>
                       <span className={styles.badge} style={{ background: '#f7fafc', color: '#4a5568' }}>
-                        {chargeStatusLabels[charge.status]}
+                        {t(`financial.chargeStatus.${charge.status}`)}
                       </span>
                     </td>
-                    <td>{charge.method ? chargeMethodLabels[charge.method] : '—'}</td>
+                    <td>{charge.method ? t(`financial.chargeMethod.${charge.method}`) : '—'}</td>
                     <td>
                       <div className={styles.actions}>
                         <button className={styles.editBtn} onClick={() => openEdit(charge)}>
-                          Editar
+                          {t('common.edit')}
                         </button>
                         <button className={styles.deleteBtn} onClick={() => setDeleteTarget(charge)}>
-                          Excluir
+                          {t('common.delete')}
                         </button>
                       </div>
                     </td>
@@ -236,12 +199,12 @@ function ChargesSection() {
       )}
 
       {modalOpen && (
-        <Modal title={editing ? 'Editar Cobrança' : 'Nova Cobrança'} onClose={() => setModalOpen(false)}>
+        <Modal title={editing ? t('financial.charges.editTitle') : t('financial.charges.createTitle')} onClose={() => setModalOpen(false)}>
           <form className={styles.form} onSubmit={handleSubmit}>
             {formError && <div className={styles.formError}>{formError}</div>}
             <div className={styles.formRow}>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="charge-client">Cliente</label>
+                <label htmlFor="charge-client">{t('financial.charges.fields.client')}</label>
                 <select
                   id="charge-client"
                   value={form.clientId ?? ''}
@@ -249,14 +212,14 @@ function ChargesSection() {
                     setForm({ ...form, clientId: e.target.value ? parseInt(e.target.value) : null })
                   }
                 >
-                  <option value="">Sem cliente</option>
+                  <option value="">{t('financial.charges.noClient')}</option>
                   {clients.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="charge-amount">Valor (R$) *</label>
+                <label htmlFor="charge-amount">{t('financial.charges.fields.amount')}</label>
                 <input
                   id="charge-amount"
                   type="number"
@@ -268,7 +231,7 @@ function ChargesSection() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="charge-due">Vencimento</label>
+                <label htmlFor="charge-due">{t('financial.charges.fields.dueDate')}</label>
                 <input
                   id="charge-due"
                   type="date"
@@ -277,19 +240,19 @@ function ChargesSection() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="charge-status">Status</label>
+                <label htmlFor="charge-status">{t('financial.charges.fields.status')}</label>
                 <select
                   id="charge-status"
                   value={form.status ?? 'PENDING'}
                   onChange={(e) => setForm({ ...form, status: e.target.value as ChargeStatus })}
                 >
-                  {(Object.keys(chargeStatusLabels) as ChargeStatus[]).map((s) => (
-                    <option key={s} value={s}>{chargeStatusLabels[s]}</option>
+                  {(['PENDING', 'SENT', 'PAID', 'OVERDUE', 'CANCELLED'] as ChargeStatus[]).map((s) => (
+                    <option key={s} value={s}>{t(`financial.chargeStatus.${s}`)}</option>
                   ))}
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="charge-method">Método</label>
+                <label htmlFor="charge-method">{t('financial.charges.fields.method')}</label>
                 <select
                   id="charge-method"
                   value={form.method ?? ''}
@@ -297,14 +260,14 @@ function ChargesSection() {
                     setForm({ ...form, method: (e.target.value as ChargeMethod) || null })
                   }
                 >
-                  <option value="">Não informado</option>
-                  {(Object.keys(chargeMethodLabels) as ChargeMethod[]).map((m) => (
-                    <option key={m} value={m}>{chargeMethodLabels[m]}</option>
+                  <option value="">{t('financial.charges.noMethod')}</option>
+                  {(['BOLETO', 'PIX', 'CREDIT_CARD', 'BANK_TRANSFER', 'CASH'] as ChargeMethod[]).map((m) => (
+                    <option key={m} value={m}>{t(`financial.chargeMethod.${m}`)}</option>
                   ))}
                 </select>
               </div>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="charge-notes">Observações</label>
+                <label htmlFor="charge-notes">{t('financial.charges.fields.notes')}</label>
                 <textarea
                   id="charge-notes"
                   value={form.notes ?? ''}
@@ -314,10 +277,10 @@ function ChargesSection() {
             </div>
             <div className={styles.formActions}>
               <button type="button" className={styles.cancelBtn} onClick={() => setModalOpen(false)}>
-                Cancelar
+                {t('common.cancel')}
               </button>
               <button type="submit" className={styles.submitBtn} disabled={saving}>
-                {saving ? 'Salvando...' : 'Salvar'}
+                {saving ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </form>
@@ -326,7 +289,7 @@ function ChargesSection() {
 
       {deleteTarget && (
         <ConfirmDialog
-          message={`Deseja excluir esta cobrança de ${formatCurrency(deleteTarget.amount)}? Esta ação não pode ser desfeita.`}
+          message={t('financial.charges.deleteConfirm', { amount: formatCurrency(deleteTarget.amount) })}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
           loading={deleting}
@@ -340,6 +303,7 @@ function ChargesSection() {
 const emptyAccount: AccountRequest = { name: '', type: 'CHECKING', balance: 0, active: true }
 
 function AccountsSection() {
+  const { t } = useTranslation()
   const { accounts, loading, error, fetchAccounts, createAccount, updateAccount, removeAccount, clearError } =
     useFinancialStore()
 
@@ -373,7 +337,7 @@ function AccountsSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name.trim()) {
-      setFormError('O nome é obrigatório.')
+      setFormError(t('financial.accounts.nameRequired'))
       return
     }
     setSaving(true)
@@ -381,10 +345,10 @@ function AccountsSection() {
     try {
       if (editing) {
         await updateAccount(editing.id, form)
-        notify('success', 'Conta atualizada com sucesso.')
+        notify('success', t('financial.accounts.updated'))
       } else {
         await createAccount(form)
-        notify('success', 'Conta criada com sucesso.')
+        notify('success', t('financial.accounts.created'))
       }
       setModalOpen(false)
     } catch (err) {
@@ -399,7 +363,7 @@ function AccountsSection() {
     setDeleting(true)
     try {
       await removeAccount(deleteTarget.id)
-      notify('success', `Conta "${deleteTarget.name}" excluída com sucesso.`)
+      notify('success', t('financial.accounts.deleted', { name: deleteTarget.name }))
     } catch (err) {
       notify('error', getErrorMessage(err))
     } finally {
@@ -413,7 +377,7 @@ function AccountsSection() {
       <div className={styles.pageHeader} style={{ marginBottom: '1rem' }}>
         <span />
         <button className={styles.addBtn} onClick={openCreate}>
-          + Nova Conta
+          {t('financial.accounts.newAccount')}
         </button>
       </div>
 
@@ -423,7 +387,7 @@ function AccountsSection() {
           role={notification.type === 'error' ? 'alert' : 'status'}
         >
           {notification.message}
-          <button className={styles.notificationClose} onClick={clearNotification} aria-label="Fechar notificação">✕</button>
+          <button className={styles.notificationClose} onClick={clearNotification} aria-label={t('common.closeNotification')}>✕</button>
         </div>
       )}
 
@@ -437,40 +401,40 @@ function AccountsSection() {
       {loading ? (
         <div className={styles.loading}>
           <span className={styles.spinner} aria-hidden="true" />
-          Carregando...
+          {t('common.loading')}
         </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Nome</th>
-                <th>Tipo</th>
-                <th>Saldo</th>
-                <th>Status</th>
-                <th>Ações</th>
+                <th>{t('financial.accounts.columns.name')}</th>
+                <th>{t('financial.accounts.columns.type')}</th>
+                <th>{t('financial.accounts.columns.balance')}</th>
+                <th>{t('financial.accounts.columns.status')}</th>
+                <th>{t('financial.accounts.columns.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {accounts.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className={styles.emptyState}>Nenhuma conta encontrada.</td>
+                  <td colSpan={5} className={styles.emptyState}>{t('financial.accounts.notFound')}</td>
                 </tr>
               ) : (
                 accounts.map((account) => (
                   <tr key={account.id}>
                     <td>{account.name}</td>
-                    <td>{accountTypeLabels[account.type]}</td>
+                    <td>{t(`financial.accountType.${account.type}`)}</td>
                     <td>{formatCurrency(account.balance)}</td>
                     <td>
                       <span className={`${styles.badge} ${account.active ? styles.badgeActive : styles.badgeInactive}`}>
-                        {account.active ? 'Ativa' : 'Inativa'}
+                        {account.active ? t('common.active_f') : t('common.inactive_f')}
                       </span>
                     </td>
                     <td>
                       <div className={styles.actions}>
-                        <button className={styles.editBtn} onClick={() => openEdit(account)}>Editar</button>
-                        <button className={styles.deleteBtn} onClick={() => setDeleteTarget(account)}>Excluir</button>
+                        <button className={styles.editBtn} onClick={() => openEdit(account)}>{t('common.edit')}</button>
+                        <button className={styles.deleteBtn} onClick={() => setDeleteTarget(account)}>{t('common.delete')}</button>
                       </div>
                     </td>
                   </tr>
@@ -482,12 +446,12 @@ function AccountsSection() {
       )}
 
       {modalOpen && (
-        <Modal title={editing ? 'Editar Conta' : 'Nova Conta'} onClose={() => setModalOpen(false)}>
+        <Modal title={editing ? t('financial.accounts.editTitle') : t('financial.accounts.createTitle')} onClose={() => setModalOpen(false)}>
           <form className={styles.form} onSubmit={handleSubmit}>
             {formError && <div className={styles.formError}>{formError}</div>}
             <div className={styles.formRow}>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="acc-name">Nome *</label>
+                <label htmlFor="acc-name">{t('financial.accounts.fields.name')}</label>
                 <input
                   id="acc-name"
                   type="text"
@@ -498,19 +462,19 @@ function AccountsSection() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="acc-type">Tipo *</label>
+                <label htmlFor="acc-type">{t('financial.accounts.fields.type')}</label>
                 <select
                   id="acc-type"
                   value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value as AccountType })}
                 >
-                  {(Object.keys(accountTypeLabels) as AccountType[]).map((t) => (
-                    <option key={t} value={t}>{accountTypeLabels[t]}</option>
+                  {(['CHECKING', 'SAVINGS', 'CASH', 'CREDIT_CARD'] as AccountType[]).map((type) => (
+                    <option key={type} value={type}>{t(`financial.accountType.${type}`)}</option>
                   ))}
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="acc-balance">Saldo (R$)</label>
+                <label htmlFor="acc-balance">{t('financial.accounts.fields.balance')}</label>
                 <input
                   id="acc-balance"
                   type="number"
@@ -527,14 +491,14 @@ function AccountsSection() {
                     onChange={(e) => setForm({ ...form, active: e.target.checked })}
                     style={{ marginRight: '0.5rem' }}
                   />
-                  Ativa
+                  {t('financial.accounts.fields.active')}
                 </label>
               </div>
             </div>
             <div className={styles.formActions}>
-              <button type="button" className={styles.cancelBtn} onClick={() => setModalOpen(false)}>Cancelar</button>
+              <button type="button" className={styles.cancelBtn} onClick={() => setModalOpen(false)}>{t('common.cancel')}</button>
               <button type="submit" className={styles.submitBtn} disabled={saving}>
-                {saving ? 'Salvando...' : 'Salvar'}
+                {saving ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </form>
@@ -543,7 +507,7 @@ function AccountsSection() {
 
       {deleteTarget && (
         <ConfirmDialog
-          message={`Deseja excluir a conta "${deleteTarget.name}"? Esta ação não pode ser desfeita.`}
+          message={t('financial.accounts.deleteConfirm', { name: deleteTarget.name })}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
           loading={deleting}
@@ -557,6 +521,7 @@ function AccountsSection() {
 const emptyCategory: CategoryRequest = { name: '', type: 'EXPENSE', description: '', active: true }
 
 function CategoriesSection() {
+  const { t } = useTranslation()
   const { categories, loading, error, fetchCategories, createCategory, updateCategory, removeCategory, clearError } =
     useFinancialStore()
 
@@ -590,7 +555,7 @@ function CategoriesSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name.trim()) {
-      setFormError('O nome é obrigatório.')
+      setFormError(t('financial.categories.nameRequired'))
       return
     }
     setSaving(true)
@@ -598,10 +563,10 @@ function CategoriesSection() {
     try {
       if (editing) {
         await updateCategory(editing.id, form)
-        notify('success', 'Categoria atualizada com sucesso.')
+        notify('success', t('financial.categories.updated'))
       } else {
         await createCategory(form)
-        notify('success', 'Categoria criada com sucesso.')
+        notify('success', t('financial.categories.created'))
       }
       setModalOpen(false)
     } catch (err) {
@@ -616,7 +581,7 @@ function CategoriesSection() {
     setDeleting(true)
     try {
       await removeCategory(deleteTarget.id)
-      notify('success', `Categoria "${deleteTarget.name}" excluída com sucesso.`)
+      notify('success', t('financial.categories.deleted', { name: deleteTarget.name }))
     } catch (err) {
       notify('error', getErrorMessage(err))
     } finally {
@@ -630,7 +595,7 @@ function CategoriesSection() {
       <div className={styles.pageHeader} style={{ marginBottom: '1rem' }}>
         <span />
         <button className={styles.addBtn} onClick={openCreate}>
-          + Nova Categoria
+          {t('financial.categories.newCategory')}
         </button>
       </div>
 
@@ -640,7 +605,7 @@ function CategoriesSection() {
           role={notification.type === 'error' ? 'alert' : 'status'}
         >
           {notification.message}
-          <button className={styles.notificationClose} onClick={clearNotification} aria-label="Fechar notificação">✕</button>
+          <button className={styles.notificationClose} onClick={clearNotification} aria-label={t('common.closeNotification')}>✕</button>
         </div>
       )}
 
@@ -654,40 +619,40 @@ function CategoriesSection() {
       {loading ? (
         <div className={styles.loading}>
           <span className={styles.spinner} aria-hidden="true" />
-          Carregando...
+          {t('common.loading')}
         </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Nome</th>
-                <th>Tipo</th>
-                <th>Descrição</th>
-                <th>Status</th>
-                <th>Ações</th>
+                <th>{t('financial.categories.columns.name')}</th>
+                <th>{t('financial.categories.columns.type')}</th>
+                <th>{t('financial.categories.columns.description')}</th>
+                <th>{t('financial.categories.columns.status')}</th>
+                <th>{t('financial.categories.columns.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {categories.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className={styles.emptyState}>Nenhuma categoria encontrada.</td>
+                  <td colSpan={5} className={styles.emptyState}>{t('financial.categories.notFound')}</td>
                 </tr>
               ) : (
                 categories.map((cat) => (
                   <tr key={cat.id}>
                     <td>{cat.name}</td>
-                    <td>{categoryTypeLabels[cat.type]}</td>
+                    <td>{t(`financial.entryType.${cat.type}`)}</td>
                     <td>{cat.description || '—'}</td>
                     <td>
                       <span className={`${styles.badge} ${cat.active ? styles.badgeActive : styles.badgeInactive}`}>
-                        {cat.active ? 'Ativa' : 'Inativa'}
+                        {cat.active ? t('common.active_f') : t('common.inactive_f')}
                       </span>
                     </td>
                     <td>
                       <div className={styles.actions}>
-                        <button className={styles.editBtn} onClick={() => openEdit(cat)}>Editar</button>
-                        <button className={styles.deleteBtn} onClick={() => setDeleteTarget(cat)}>Excluir</button>
+                        <button className={styles.editBtn} onClick={() => openEdit(cat)}>{t('common.edit')}</button>
+                        <button className={styles.deleteBtn} onClick={() => setDeleteTarget(cat)}>{t('common.delete')}</button>
                       </div>
                     </td>
                   </tr>
@@ -699,12 +664,12 @@ function CategoriesSection() {
       )}
 
       {modalOpen && (
-        <Modal title={editing ? 'Editar Categoria' : 'Nova Categoria'} onClose={() => setModalOpen(false)}>
+        <Modal title={editing ? t('financial.categories.editTitle') : t('financial.categories.createTitle')} onClose={() => setModalOpen(false)}>
           <form className={styles.form} onSubmit={handleSubmit}>
             {formError && <div className={styles.formError}>{formError}</div>}
             <div className={styles.formRow}>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="cat-name">Nome *</label>
+                <label htmlFor="cat-name">{t('financial.categories.fields.name')}</label>
                 <input
                   id="cat-name"
                   type="text"
@@ -715,19 +680,19 @@ function CategoriesSection() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="cat-type">Tipo *</label>
+                <label htmlFor="cat-type">{t('financial.categories.fields.type')}</label>
                 <select
                   id="cat-type"
                   value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value as CategoryType })}
                 >
-                  {(Object.keys(categoryTypeLabels) as CategoryType[]).map((t) => (
-                    <option key={t} value={t}>{categoryTypeLabels[t]}</option>
+                  {(['INCOME', 'EXPENSE'] as CategoryType[]).map((type) => (
+                    <option key={type} value={type}>{t(`financial.entryType.${type}`)}</option>
                   ))}
                 </select>
               </div>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="cat-desc">Descrição</label>
+                <label htmlFor="cat-desc">{t('financial.categories.fields.description')}</label>
                 <textarea
                   id="cat-desc"
                   value={form.description ?? ''}
@@ -742,14 +707,14 @@ function CategoriesSection() {
                     onChange={(e) => setForm({ ...form, active: e.target.checked })}
                     style={{ marginRight: '0.5rem' }}
                   />
-                  Ativa
+                  {t('financial.categories.fields.active')}
                 </label>
               </div>
             </div>
             <div className={styles.formActions}>
-              <button type="button" className={styles.cancelBtn} onClick={() => setModalOpen(false)}>Cancelar</button>
+              <button type="button" className={styles.cancelBtn} onClick={() => setModalOpen(false)}>{t('common.cancel')}</button>
               <button type="submit" className={styles.submitBtn} disabled={saving}>
-                {saving ? 'Salvando...' : 'Salvar'}
+                {saving ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </form>
@@ -758,7 +723,7 @@ function CategoriesSection() {
 
       {deleteTarget && (
         <ConfirmDialog
-          message={`Deseja excluir a categoria "${deleteTarget.name}"? Esta ação não pode ser desfeita.`}
+          message={t('financial.categories.deleteConfirm', { name: deleteTarget.name })}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
           loading={deleting}
@@ -782,6 +747,7 @@ const emptyEntry: FinancialEntryRequest = {
 }
 
 function EntriesSection() {
+  const { t } = useTranslation()
   const { entries, accounts, categories, loading, error, fetchEntries, fetchAccounts, fetchCategories, createEntry, updateEntry, removeEntry, clearError } =
     useFinancialStore()
 
@@ -827,11 +793,11 @@ function EntriesSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.description.trim()) {
-      setFormError('A descrição é obrigatória.')
+      setFormError(t('financial.entries.descriptionRequired'))
       return
     }
     if (!form.amount || form.amount <= 0) {
-      setFormError('Informe um valor válido.')
+      setFormError(t('financial.entries.amountRequired'))
       return
     }
     setSaving(true)
@@ -839,10 +805,10 @@ function EntriesSection() {
     try {
       if (editing) {
         await updateEntry(editing.id, form)
-        notify('success', 'Lançamento atualizado com sucesso.')
+        notify('success', t('financial.entries.updated'))
       } else {
         await createEntry(form)
-        notify('success', 'Lançamento criado com sucesso.')
+        notify('success', t('financial.entries.created'))
       }
       setModalOpen(false)
     } catch (err) {
@@ -857,7 +823,7 @@ function EntriesSection() {
     setDeleting(true)
     try {
       await removeEntry(deleteTarget.id)
-      notify('success', `Lançamento "${deleteTarget.description}" excluído com sucesso.`)
+      notify('success', t('financial.entries.deleted', { description: deleteTarget.description }))
     } catch (err) {
       notify('error', getErrorMessage(err))
     } finally {
@@ -871,7 +837,7 @@ function EntriesSection() {
       <div className={styles.pageHeader} style={{ marginBottom: '1rem' }}>
         <span />
         <button className={styles.addBtn} onClick={openCreate}>
-          + Novo Lançamento
+          {t('financial.entries.newEntry')}
         </button>
       </div>
 
@@ -881,7 +847,7 @@ function EntriesSection() {
           role={notification.type === 'error' ? 'alert' : 'status'}
         >
           {notification.message}
-          <button className={styles.notificationClose} onClick={clearNotification} aria-label="Fechar notificação">✕</button>
+          <button className={styles.notificationClose} onClick={clearNotification} aria-label={t('common.closeNotification')}>✕</button>
         </div>
       )}
 
@@ -895,27 +861,27 @@ function EntriesSection() {
       {loading ? (
         <div className={styles.loading}>
           <span className={styles.spinner} aria-hidden="true" />
-          Carregando...
+          {t('common.loading')}
         </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Descrição</th>
-                <th>Tipo</th>
-                <th>Valor</th>
-                <th>Vencimento</th>
-                <th>Pago</th>
-                <th>Categoria</th>
-                <th>Conta</th>
-                <th>Ações</th>
+                <th>{t('financial.entries.columns.description')}</th>
+                <th>{t('financial.entries.columns.type')}</th>
+                <th>{t('financial.entries.columns.amount')}</th>
+                <th>{t('financial.entries.columns.dueDate')}</th>
+                <th>{t('financial.entries.columns.paid')}</th>
+                <th>{t('financial.entries.columns.category')}</th>
+                <th>{t('financial.entries.columns.account')}</th>
+                <th>{t('financial.entries.columns.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {entries.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className={styles.emptyState}>Nenhum lançamento encontrado.</td>
+                  <td colSpan={8} className={styles.emptyState}>{t('financial.entries.notFound')}</td>
                 </tr>
               ) : (
                 entries.map((entry) => (
@@ -929,22 +895,22 @@ function EntriesSection() {
                           color: entry.type === 'INCOME' ? '#276749' : '#c53030',
                         }}
                       >
-                        {entryTypeLabels[entry.type]}
+                        {t(`financial.entryType.${entry.type}`)}
                       </span>
                     </td>
                     <td>{formatCurrency(entry.amount)}</td>
                     <td>{formatDate(entry.dueDate)}</td>
                     <td>
                       <span className={`${styles.badge} ${entry.paid ? styles.badgeActive : styles.badgeInactive}`}>
-                        {entry.paid ? 'Sim' : 'Não'}
+                        {entry.paid ? t('common.yes') : t('common.no')}
                       </span>
                     </td>
                     <td>{entry.categoryName || '—'}</td>
                     <td>{entry.accountName || '—'}</td>
                     <td>
                       <div className={styles.actions}>
-                        <button className={styles.editBtn} onClick={() => openEdit(entry)}>Editar</button>
-                        <button className={styles.deleteBtn} onClick={() => setDeleteTarget(entry)}>Excluir</button>
+                        <button className={styles.editBtn} onClick={() => openEdit(entry)}>{t('common.edit')}</button>
+                        <button className={styles.deleteBtn} onClick={() => setDeleteTarget(entry)}>{t('common.delete')}</button>
                       </div>
                     </td>
                   </tr>
@@ -956,12 +922,12 @@ function EntriesSection() {
       )}
 
       {modalOpen && (
-        <Modal title={editing ? 'Editar Lançamento' : 'Novo Lançamento'} onClose={() => setModalOpen(false)}>
+        <Modal title={editing ? t('financial.entries.editTitle') : t('financial.entries.createTitle')} onClose={() => setModalOpen(false)}>
           <form className={styles.form} onSubmit={handleSubmit}>
             {formError && <div className={styles.formError}>{formError}</div>}
             <div className={styles.formRow}>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="entry-desc">Descrição *</label>
+                <label htmlFor="entry-desc">{t('financial.entries.fields.description')}</label>
                 <input
                   id="entry-desc"
                   type="text"
@@ -971,18 +937,18 @@ function EntriesSection() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="entry-type">Tipo *</label>
+                <label htmlFor="entry-type">{t('financial.entries.fields.type')}</label>
                 <select
                   id="entry-type"
                   value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value as EntryType })}
                 >
-                  <option value="INCOME">Receita</option>
-                  <option value="EXPENSE">Despesa</option>
+                  <option value="INCOME">{t('financial.entryType.INCOME')}</option>
+                  <option value="EXPENSE">{t('financial.entryType.EXPENSE')}</option>
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="entry-amount">Valor (R$) *</label>
+                <label htmlFor="entry-amount">{t('financial.entries.fields.amount')}</label>
                 <input
                   id="entry-amount"
                   type="number"
@@ -994,7 +960,7 @@ function EntriesSection() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="entry-due">Vencimento</label>
+                <label htmlFor="entry-due">{t('financial.entries.fields.dueDate')}</label>
                 <input
                   id="entry-due"
                   type="date"
@@ -1003,7 +969,7 @@ function EntriesSection() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="entry-payment">Data de Pagamento</label>
+                <label htmlFor="entry-payment">{t('financial.entries.fields.paymentDate')}</label>
                 <input
                   id="entry-payment"
                   type="date"
@@ -1012,7 +978,7 @@ function EntriesSection() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="entry-category">Categoria</label>
+                <label htmlFor="entry-category">{t('financial.entries.fields.category')}</label>
                 <select
                   id="entry-category"
                   value={form.categoryId ?? ''}
@@ -1020,14 +986,14 @@ function EntriesSection() {
                     setForm({ ...form, categoryId: e.target.value ? parseInt(e.target.value) : null })
                   }
                 >
-                  <option value="">Sem categoria</option>
+                  <option value="">{t('financial.entries.fields.noCategory')}</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="entry-account">Conta</label>
+                <label htmlFor="entry-account">{t('financial.entries.fields.account')}</label>
                 <select
                   id="entry-account"
                   value={form.accountId ?? ''}
@@ -1035,14 +1001,14 @@ function EntriesSection() {
                     setForm({ ...form, accountId: e.target.value ? parseInt(e.target.value) : null })
                   }
                 >
-                  <option value="">Sem conta</option>
+                  <option value="">{t('financial.entries.fields.noAccount')}</option>
                   {accounts.map((a) => (
                     <option key={a.id} value={a.id}>{a.name}</option>
                   ))}
                 </select>
               </div>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="entry-notes">Observações</label>
+                <label htmlFor="entry-notes">{t('financial.entries.fields.notes')}</label>
                 <textarea
                   id="entry-notes"
                   value={form.notes ?? ''}
@@ -1057,14 +1023,14 @@ function EntriesSection() {
                     onChange={(e) => setForm({ ...form, paid: e.target.checked })}
                     style={{ marginRight: '0.5rem' }}
                   />
-                  Pago
+                  {t('financial.entries.fields.paid')}
                 </label>
               </div>
             </div>
             <div className={styles.formActions}>
-              <button type="button" className={styles.cancelBtn} onClick={() => setModalOpen(false)}>Cancelar</button>
+              <button type="button" className={styles.cancelBtn} onClick={() => setModalOpen(false)}>{t('common.cancel')}</button>
               <button type="submit" className={styles.submitBtn} disabled={saving}>
-                {saving ? 'Salvando...' : 'Salvar'}
+                {saving ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </form>
@@ -1073,7 +1039,7 @@ function EntriesSection() {
 
       {deleteTarget && (
         <ConfirmDialog
-          message={`Deseja excluir o lançamento "${deleteTarget.description}"? Esta ação não pode ser desfeita.`}
+          message={t('financial.entries.deleteConfirm', { description: deleteTarget.description })}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
           loading={deleting}
@@ -1085,21 +1051,22 @@ function EntriesSection() {
 
 // ── Main FinancialPage ────────────────────────────────────────
 export default function FinancialPage() {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<Tab>('charges')
 
   return (
     <div className={styles.container}>
       <div className={styles.pageHeader}>
-        <h2 className={styles.title}>Financeiro</h2>
+        <h2 className={styles.title}>{t('financial.title')}</h2>
       </div>
 
       <div className={styles.tabs}>
         {(
           [
-            { key: 'charges', label: 'Cobranças' },
-            { key: 'accounts', label: 'Contas' },
-            { key: 'categories', label: 'Categorias' },
-            { key: 'entries', label: 'Lançamentos' },
+            { key: 'charges', label: t('financial.tabs.charges') },
+            { key: 'accounts', label: t('financial.tabs.accounts') },
+            { key: 'categories', label: t('financial.tabs.categories') },
+            { key: 'entries', label: t('financial.tabs.entries') },
           ] as { key: Tab; label: string }[]
         ).map(({ key, label }) => (
           <button
