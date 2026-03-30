@@ -1,5 +1,5 @@
 .header {
-  background: #1a1a2e;
+  background: var(--color-header-bg);
   color: white;
   padding: 0 2rem;
   height: 64px;
@@ -10,6 +10,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background-color 0.2s;
 }
 
 .brand {
@@ -26,7 +27,7 @@
 
 .tagline {
   font-size: 0.8rem;
-  color: #a0aec0;
+  color: var(--color-header-tagline);
 }
 
 .user {
@@ -42,10 +43,26 @@
 
 .userRole {
   font-size: 0.75rem;
-  background: #0f3460;
+  background: var(--color-header-role-bg);
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
-  color: #90cdf4;
+  color: var(--color-header-role-text);
+}
+
+.themeToggle {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.themeToggle:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .logoutBtn {

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../store/authStore'
+import { useThemeStore } from '../../store/themeStore'
 import { authService } from '../../services/authService'
 import LanguageSelector from '../ui/LanguageSelector'
 import styles from './Header.module.css'
@@ -8,6 +9,7 @@ import styles from './Header.module.css'
 export default function Header() {
   const { t } = useTranslation()
   const { name, role, refreshToken, logout } = useAuthStore()
+  const { theme, toggle } = useThemeStore()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -30,6 +32,14 @@ export default function Header() {
       </div>
       <div className={styles.user}>
         <LanguageSelector />
+        <button
+          onClick={toggle}
+          className={styles.themeToggle}
+          aria-label={t(theme === 'dark' ? 'theme.switchToLight' : 'theme.switchToDark')}
+          title={t(theme === 'dark' ? 'theme.switchToLight' : 'theme.switchToDark')}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
         <span className={styles.userName}>{name}</span>
         <span className={styles.userRole}>{role}</span>
         <button onClick={handleLogout} className={styles.logoutBtn}>

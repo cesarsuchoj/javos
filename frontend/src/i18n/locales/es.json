@@ -324,5 +324,9 @@
     "pt-BR": "Português",
     "en": "English",
     "es": "Español"
+  },
+  "theme": {
+    "switchToDark": "Cambiar a modo oscuro",
+    "switchToLight": "Cambiar a modo claro"
   }
 }

@@ -10,17 +10,18 @@
 }
 
 .dialog {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 12px;
   padding: 2rem;
   max-width: 400px;
   width: 100%;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  transition: background-color 0.2s;
 }
 
 .message {
   font-size: 1rem;
-  color: #2d3748;
+  color: var(--color-text);
   margin: 0 0 1.5rem;
   line-height: 1.6;
 }
@@ -33,17 +34,17 @@
 
 .cancelBtn {
   padding: 0.6rem 1.2rem;
-  border: 1px solid #e2e8f0;
-  background: white;
+  border: 1px solid var(--color-cancel-btn-border);
+  background: var(--color-cancel-btn-bg);
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #4a5568;
+  color: var(--color-cancel-btn-text);
   transition: background 0.15s;
 }
 
 .cancelBtn:hover {
-  background: #f7fafc;
+  background: var(--color-cancel-btn-hover-bg);
 }
 
 .confirmBtn {

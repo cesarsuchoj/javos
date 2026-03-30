@@ -11,6 +11,7 @@
 
 .main {
   flex: 1;
-  background: #f0f4f8;
+  background: var(--color-bg);
   overflow-y: auto;
+  transition: background-color 0.2s;
 }
