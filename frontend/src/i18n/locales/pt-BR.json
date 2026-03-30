@@ -328,5 +328,11 @@
   "theme": {
     "switchToDark": "Alternar para modo escuro",
     "switchToLight": "Alternar para modo claro"
+  },
+  "cookieConsent": {
+    "title": "Consentimento de Cookies",
+    "message": "Usamos dados de uso para melhorar a aplicação. Nenhuma informação pessoal é compartilhada com terceiros. Você pode recusar a qualquer momento.",
+    "accept": "Aceitar",
+    "deny": "Recusar"
   }
 }

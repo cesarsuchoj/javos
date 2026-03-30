@@ -1,0 +1,41 @@
+# ============================================================
+# Prometheus - Configuração de Scrape
+# ============================================================
+# Coletando métricas do backend Javos via /actuator/prometheus
+# ============================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: production
+
+# Regras de alerta (arquivo separado para alertas)
+rule_files:
+  - "alert_rules.yml"
+
+# Configuração do Alertmanager (opcional)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
+scrape_configs:
+  # Métricas do backend Spring Boot (Micrometer/Actuator)
+  - job_name: javos-backend
+    metrics_path: /actuator/prometheus
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - backend:8080
+    # Rótulos adicionais para identificar o serviço
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: javos-backend
+
+  # Auto-monitoramento do Prometheus
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090

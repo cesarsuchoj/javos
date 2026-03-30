@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { authService } from '../../services/authService'
 import { useAuthStore } from '../../store/authStore'
 import { getErrorMessage } from '../../services/api'
+import { analyticsService } from '../../services/analyticsService'
 import styles from './Login.module.css'
 
 export default function Login() {
@@ -33,8 +34,10 @@ export default function Login() {
     try {
       const response = await authService.login({ username, password })
       login(response.token, response.refreshToken, response.username, response.name, response.role)
+      analyticsService.trackLogin(response.username)
       navigate('/dashboard')
     } catch (err) {
+      analyticsService.trackError(getErrorMessage(err), 'login')
       setError(getErrorMessage(err))
     } finally {
       setLoading(false)
