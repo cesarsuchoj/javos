@@ -2,13 +2,140 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #1a1a2e;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* ── Light mode (default) ── */
+  --color-bg: #f0f4f8;
+  --color-bg-sidebar: #f7fafc;
+  --color-bg-card: #ffffff;
+  --color-bg-table-header: #f7fafc;
+  --color-header-bg: #1a1a2e;
+  --color-header-tagline: #a0aec0;
+  --color-header-role-bg: #0f3460;
+  --color-header-role-text: #90cdf4;
+  --color-text: #2d3748;
+  --color-text-secondary: #4a5568;
+  --color-text-muted: #718096;
+  --color-border: #e2e8f0;
+  --color-border-light: #f0f4f8;
+  --color-accent: #0f3460;
+  --color-accent-hover: #16213e;
+  --color-row-hover: #f7fafc;
+
+  --color-nav-text: #4a5568;
+  --color-nav-hover-bg: #edf2f7;
+  --color-nav-hover-text: #1a1a2e;
+  --color-nav-active-bg: #0f3460;
+  --color-nav-active-text: #ffffff;
+
+  --color-edit-bg: #ebf8ff;
+  --color-edit-text: #2b6cb0;
+  --color-edit-border: #bee3f8;
+  --color-edit-bg-hover: #bee3f8;
+  --color-delete-bg: #fff5f5;
+  --color-delete-text: #c53030;
+  --color-delete-border: #fed7d7;
+  --color-delete-bg-hover: #fed7d7;
+
+  --color-success-bg: #f0fff4;
+  --color-success-text: #276749;
+  --color-success-border: #9ae6b4;
+  --color-error-bg: #fff5f5;
+  --color-error-text: #c53030;
+  --color-error-border: #fed7d7;
+
+  --color-badge-active-bg: #f0fff4;
+  --color-badge-active-text: #276749;
+  --color-badge-inactive-bg: #fff5f5;
+  --color-badge-inactive-text: #c53030;
+
+  --color-tab-text: #718096;
+  --color-tab-hover-text: #0f3460;
+  --color-tab-active-text: #0f3460;
+  --color-tab-active-border: #0f3460;
+
+  --color-form-label: #4a5568;
+  --color-form-input-bg: #ffffff;
+  --color-form-input-border: #e2e8f0;
+  --color-form-input-focus: #0f3460;
+  --color-form-input-text: #2d3748;
+
+  --color-cancel-btn-bg: #ffffff;
+  --color-cancel-btn-border: #e2e8f0;
+  --color-cancel-btn-text: #4a5568;
+  --color-cancel-btn-hover-bg: #f7fafc;
+
+  --color-skeleton-base: #e2e8f0;
+  --color-skeleton-shine: #f7fafc;
+}
+
+/* ── Dark mode ── */
+[data-theme='dark'] {
+  --color-bg: #111827;
+  --color-bg-sidebar: #1f2937;
+  --color-bg-card: #1f2937;
+  --color-bg-table-header: #1f2937;
+  --color-header-bg: #0f172a;
+  --color-header-tagline: #6b7280;
+  --color-header-role-bg: #1e3a5f;
+  --color-header-role-text: #93c5fd;
+  --color-text: #f9fafb;
+  --color-text-secondary: #d1d5db;
+  --color-text-muted: #9ca3af;
+  --color-border: #374151;
+  --color-border-light: #1f2937;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-row-hover: #374151;
+
+  --color-nav-text: #9ca3af;
+  --color-nav-hover-bg: #374151;
+  --color-nav-hover-text: #f9fafb;
+  --color-nav-active-bg: #3b82f6;
+  --color-nav-active-text: #ffffff;
+
+  --color-edit-bg: #1e3a5f;
+  --color-edit-text: #93c5fd;
+  --color-edit-border: #2563eb;
+  --color-edit-bg-hover: #1d4ed8;
+  --color-delete-bg: #450a0a;
+  --color-delete-text: #fca5a5;
+  --color-delete-border: #7f1d1d;
+  --color-delete-bg-hover: #7f1d1d;
+
+  --color-success-bg: #064e3b;
+  --color-success-text: #6ee7b7;
+  --color-success-border: #059669;
+  --color-error-bg: #450a0a;
+  --color-error-text: #fca5a5;
+  --color-error-border: #7f1d1d;
+
+  --color-badge-active-bg: #064e3b;
+  --color-badge-active-text: #6ee7b7;
+  --color-badge-inactive-bg: #450a0a;
+  --color-badge-inactive-text: #fca5a5;
+
+  --color-tab-text: #9ca3af;
+  --color-tab-hover-text: #3b82f6;
+  --color-tab-active-text: #3b82f6;
+  --color-tab-active-border: #3b82f6;
+
+  --color-form-label: #d1d5db;
+  --color-form-input-bg: #1f2937;
+  --color-form-input-border: #374151;
+  --color-form-input-focus: #3b82f6;
+  --color-form-input-text: #f9fafb;
+
+  --color-cancel-btn-bg: #1f2937;
+  --color-cancel-btn-border: #374151;
+  --color-cancel-btn-text: #d1d5db;
+  --color-cancel-btn-hover-bg: #374151;
+
+  --color-skeleton-base: #374151;
+  --color-skeleton-shine: #4b5563;
 }
 
 * {
@@ -19,8 +146,11 @@
 
 body {
   min-height: 100vh;
-  background-color: #f0f4f8;
-  color: #2d3748;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 a {
