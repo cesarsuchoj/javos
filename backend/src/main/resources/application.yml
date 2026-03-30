@@ -51,8 +51,19 @@ javos:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
     allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,PATCH,DELETE,OPTIONS}
     allowed-headers: ${CORS_ALLOWED_HEADERS:*}
-    exposed-headers: X-Correlation-Id
+    exposed-headers: X-Correlation-Id,X-API-Version,Deprecation,Sunset,Warning
     max-age: ${CORS_MAX_AGE:3600}
+
+  # API versioning – path-based strategy (/api/v1/...)
+  # To soft-deprecate a version, add it to deprecated-versions with an optional sunset date.
+  # Example:
+  #   deprecated-versions:
+  #     v1:
+  #       sunset-date: "2026-12-31"
+  #       message: "Please migrate to /api/v2/."
+  api:
+    current-version: v1
+    deprecated-versions: {}
 
   # Rate limiting (token-bucket, per client IP)
   rate-limit:

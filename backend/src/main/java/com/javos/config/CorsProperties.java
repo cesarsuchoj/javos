@@ -37,7 +37,8 @@ public class CorsProperties {
     private List<String> allowedHeaders = List.of("*");
 
     /** Response headers exposed to the browser. */
-    private List<String> exposedHeaders = List.of("X-Correlation-Id");
+    private List<String> exposedHeaders = List.of(
+            "X-Correlation-Id", "X-API-Version", "Deprecation", "Sunset", "Warning");
 
     /** Pre-flight cache duration in seconds. */
     private long maxAge = 3600L;
