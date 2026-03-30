@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import styles from './Modal.module.css'
 
 interface ModalProps {
@@ -8,6 +9,8 @@ interface ModalProps {
 }
 
 export default function Modal({ title, onClose, children }: ModalProps) {
+  const { t } = useTranslation()
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -21,7 +24,7 @@ export default function Modal({ title, onClose, children }: ModalProps) {
       <div className={styles.modal}>
         <div className={styles.header}>
           <h3 className={styles.title}>{title}</h3>
-          <button className={styles.closeBtn} onClick={onClose} aria-label="Fechar">
+          <button className={styles.closeBtn} onClick={onClose} aria-label={t('common.close')}>
             ✕
           </button>
         </div>

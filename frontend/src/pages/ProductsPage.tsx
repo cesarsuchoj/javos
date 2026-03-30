@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useProductStore } from '../store/productStore'
 import { Product, ProductRequest, ProductType } from '../types'
 import { getErrorMessage } from '../services/api'
 import { useNotification } from '../hooks/useNotification'
+import { formatCurrency } from '../i18n/locale'
 import Modal from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import styles from './crud.module.css'
@@ -19,12 +21,8 @@ const emptyForm: ProductRequest = {
   active: true,
 }
 
-const typeLabels: Record<ProductType, string> = {
-  PRODUCT: 'Produto',
-  SERVICE: 'Serviço',
-}
-
 export default function ProductsPage() {
+  const { t } = useTranslation()
   const { products, loading, error, fetchAll, create, update, remove, clearError } =
     useProductStore()
 
@@ -75,11 +73,11 @@ export default function ProductsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name.trim()) {
-      setFormError('O nome é obrigatório.')
+      setFormError(t('products.nameRequired'))
       return
     }
     if (form.price == null || isNaN(Number(form.price))) {
-      setFormError('Informe um preço válido.')
+      setFormError(t('products.priceRequired'))
       return
     }
     setSaving(true)
@@ -87,10 +85,10 @@ export default function ProductsPage() {
     try {
       if (editing) {
         await update(editing.id, form)
-        notify('success', 'Produto atualizado com sucesso.')
+        notify('success', t('products.updated'))
       } else {
         await create(form)
-        notify('success', 'Produto criado com sucesso.')
+        notify('success', t('products.created'))
       }
       setModalOpen(false)
     } catch (err) {
@@ -105,7 +103,7 @@ export default function ProductsPage() {
     setDeleting(true)
     try {
       await remove(deleteTarget.id)
-      notify('success', `Produto "${deleteTarget.name}" excluído com sucesso.`)
+      notify('success', t('products.deleted', { name: deleteTarget.name }))
     } catch (err) {
       notify('error', getErrorMessage(err))
     } finally {
@@ -114,23 +112,20 @@ export default function ProductsPage() {
     }
   }
 
-  const formatCurrency = (v: number) =>
-    v?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) ?? '—'
-
   return (
     <div className={styles.container}>
       <div className={styles.pageHeader}>
-        <h2 className={styles.title}>Produtos</h2>
+        <h2 className={styles.title}>{t('products.title')}</h2>
         <div className={styles.toolbar}>
           <input
             className={styles.searchInput}
             type="search"
-            placeholder="Buscar por nome ou código…"
+            placeholder={t('products.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <button className={styles.addBtn} onClick={openCreate}>
-            + Novo Produto
+            {t('products.newProduct')}
           </button>
         </div>
       </div>
@@ -144,7 +139,7 @@ export default function ProductsPage() {
           <button
             className={styles.notificationClose}
             onClick={clearNotification}
-            aria-label="Fechar notificação"
+            aria-label={t('common.closeNotification')}
           >
             ✕
           </button>
@@ -163,27 +158,27 @@ export default function ProductsPage() {
       {loading ? (
         <div className={styles.loading}>
           <span className={styles.spinner} aria-hidden="true" />
-          Carregando...
+          {t('common.loading')}
         </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Código</th>
-                <th>Nome</th>
-                <th>Tipo</th>
-                <th>Preço</th>
-                <th>Estoque</th>
-                <th>Status</th>
-                <th>Ações</th>
+                <th>{t('products.columns.code')}</th>
+                <th>{t('products.columns.name')}</th>
+                <th>{t('products.columns.type')}</th>
+                <th>{t('products.columns.price')}</th>
+                <th>{t('products.columns.stock')}</th>
+                <th>{t('products.columns.status')}</th>
+                <th>{t('products.columns.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className={styles.emptyState}>
-                    Nenhum produto encontrado.
+                    {t('products.notFound')}
                   </td>
                 </tr>
               ) : (
@@ -191,7 +186,7 @@ export default function ProductsPage() {
                   <tr key={product.id}>
                     <td>{product.code || '—'}</td>
                     <td>{product.name}</td>
-                    <td>{typeLabels[product.type]}</td>
+                    <td>{t(`products.types.${product.type}`)}</td>
                     <td>{formatCurrency(product.price)}</td>
                     <td>
                       {product.type === 'SERVICE'
@@ -202,7 +197,7 @@ export default function ProductsPage() {
                       <span
                         className={`${styles.badge} ${product.active ? styles.badgeActive : styles.badgeInactive}`}
                       >
-                        {product.active ? 'Ativo' : 'Inativo'}
+                        {product.active ? t('common.active') : t('common.inactive')}
                       </span>
                     </td>
                     <td>
@@ -211,13 +206,13 @@ export default function ProductsPage() {
                           className={styles.editBtn}
                           onClick={() => openEdit(product)}
                         >
-                          Editar
+                          {t('common.edit')}
                         </button>
                         <button
                           className={styles.deleteBtn}
                           onClick={() => setDeleteTarget(product)}
                         >
-                          Excluir
+                          {t('common.delete')}
                         </button>
                       </div>
                     </td>
@@ -231,14 +226,14 @@ export default function ProductsPage() {
 
       {modalOpen && (
         <Modal
-          title={editing ? 'Editar Produto' : 'Novo Produto'}
+          title={editing ? t('products.editTitle') : t('products.createTitle')}
           onClose={() => setModalOpen(false)}
         >
           <form className={styles.form} onSubmit={handleSubmit}>
             {formError && <div className={styles.formError}>{formError}</div>}
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label htmlFor="product-code">Código</label>
+                <label htmlFor="product-code">{t('products.fields.code')}</label>
                 <input
                   id="product-code"
                   type="text"
@@ -248,18 +243,18 @@ export default function ProductsPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="product-type">Tipo *</label>
+                <label htmlFor="product-type">{t('products.fields.type')}</label>
                 <select
                   id="product-type"
                   value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value as ProductType })}
                 >
-                  <option value="PRODUCT">Produto</option>
-                  <option value="SERVICE">Serviço</option>
+                  <option value="PRODUCT">{t('products.types.PRODUCT')}</option>
+                  <option value="SERVICE">{t('products.types.SERVICE')}</option>
                 </select>
               </div>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="product-name">Nome *</label>
+                <label htmlFor="product-name">{t('products.fields.name')}</label>
                 <input
                   id="product-name"
                   type="text"
@@ -270,7 +265,7 @@ export default function ProductsPage() {
                 />
               </div>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="product-desc">Descrição</label>
+                <label htmlFor="product-desc">{t('products.fields.description')}</label>
                 <textarea
                   id="product-desc"
                   value={form.description}
@@ -278,7 +273,7 @@ export default function ProductsPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="product-price">Preço (R$) *</label>
+                <label htmlFor="product-price">{t('products.fields.price')}</label>
                 <input
                   id="product-price"
                   type="number"
@@ -290,7 +285,7 @@ export default function ProductsPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="product-cost">Custo (R$)</label>
+                <label htmlFor="product-cost">{t('products.fields.cost')}</label>
                 <input
                   id="product-cost"
                   type="number"
@@ -303,7 +298,7 @@ export default function ProductsPage() {
               {form.type === 'PRODUCT' && (
                 <>
                   <div className={styles.formGroup}>
-                    <label htmlFor="product-stock">Estoque</label>
+                    <label htmlFor="product-stock">{t('products.fields.stockQty')}</label>
                     <input
                       id="product-stock"
                       type="number"
@@ -315,7 +310,7 @@ export default function ProductsPage() {
                     />
                   </div>
                   <div className={styles.formGroup}>
-                    <label htmlFor="product-unit">Unidade</label>
+                    <label htmlFor="product-unit">{t('products.fields.unit')}</label>
                     <input
                       id="product-unit"
                       type="text"
@@ -334,7 +329,7 @@ export default function ProductsPage() {
                     onChange={(e) => setForm({ ...form, active: e.target.checked })}
                     style={{ marginRight: '0.5rem' }}
                   />
-                  Ativo
+                  {t('products.fields.active')}
                 </label>
               </div>
             </div>
@@ -344,10 +339,10 @@ export default function ProductsPage() {
                 className={styles.cancelBtn}
                 onClick={() => setModalOpen(false)}
               >
-                Cancelar
+                {t('common.cancel')}
               </button>
               <button type="submit" className={styles.submitBtn} disabled={saving}>
-                {saving ? 'Salvando...' : 'Salvar'}
+                {saving ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </form>
@@ -356,7 +351,7 @@ export default function ProductsPage() {
 
       {deleteTarget && (
         <ConfirmDialog
-          message={`Deseja excluir o produto "${deleteTarget.name}"? Esta ação não pode ser desfeita.`}
+          message={t('products.deleteConfirm', { name: deleteTarget.name })}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
           loading={deleting}

@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { authService } from '../../services/authService'
 import { useAuthStore } from '../../store/authStore'
 import { getErrorMessage } from '../../services/api'
 import styles from './Login.module.css'
 
 export default function Login() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { login } = useAuthStore()
   const [username, setUsername] = useState('')
@@ -20,11 +22,11 @@ export default function Login() {
     const errors = { username: !username.trim(), password: !password.trim() }
     setFieldErrors(errors)
     if (errors.username) {
-      setError('O campo usuário é obrigatório.')
+      setError(t('auth.usernameRequired'))
       return
     }
     if (errors.password) {
-      setError('O campo senha é obrigatório.')
+      setError(t('auth.passwordRequired'))
       return
     }
     setLoading(true)
@@ -43,8 +45,8 @@ export default function Login() {
     <div className={styles.container}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Javos</h1>
-          <p className={styles.subtitle}>Sistema de Gestão</p>
+          <h1 className={styles.title}>{t('auth.title')}</h1>
+          <p className={styles.subtitle}>{t('auth.subtitle')}</p>
         </div>
         <form onSubmit={handleSubmit} className={styles.form}>
           {error && (
@@ -54,7 +56,7 @@ export default function Login() {
           )}
           <div className={styles.field}>
             <label htmlFor="username" className={styles.label}>
-              Usuário
+              {t('auth.username')}
             </label>
             <input
               id="username"
@@ -65,7 +67,7 @@ export default function Login() {
                 if (fieldErrors.username) setFieldErrors((f) => ({ ...f, username: false }))
               }}
               className={`${styles.input} ${fieldErrors.username ? styles.inputError : ''}`}
-              placeholder="Digite seu usuário"
+              placeholder={t('auth.usernamePlaceholder')}
               autoFocus
               aria-invalid={fieldErrors.username}
               aria-describedby={fieldErrors.username ? 'username-error' : undefined}
@@ -73,7 +75,7 @@ export default function Login() {
           </div>
           <div className={styles.field}>
             <label htmlFor="password" className={styles.label}>
-              Senha
+              {t('auth.password')}
             </label>
             <input
               id="password"
@@ -84,7 +86,7 @@ export default function Login() {
                 if (fieldErrors.password) setFieldErrors((f) => ({ ...f, password: false }))
               }}
               className={`${styles.input} ${fieldErrors.password ? styles.inputError : ''}`}
-              placeholder="Digite sua senha"
+              placeholder={t('auth.passwordPlaceholder')}
               aria-invalid={fieldErrors.password}
               aria-describedby={fieldErrors.password ? 'password-error' : undefined}
             />
@@ -93,10 +95,10 @@ export default function Login() {
             {loading ? (
               <>
                 <span className={styles.spinner} aria-hidden="true" />
-                Entrando...
+                {t('auth.loggingIn')}
               </>
             ) : (
-              'Entrar'
+              t('auth.login')
             )}
           </button>
         </form>
