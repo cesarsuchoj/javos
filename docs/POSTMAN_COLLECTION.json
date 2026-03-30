@@ -1,0 +1,626 @@
+{
+  "info": {
+    "name": "Javos API",
+    "description": "Coleção Postman para a API REST do sistema Javos.\n\nAntes de usar:\n1. Execute 'Login' na pasta Autenticação\n2. O token é salvo automaticamente na variável de ambiente `accessToken`\n3. Todas as demais requisições usam esse token automaticamente",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "javos-api-v1"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "username",
+      "value": "YOUR_USERNAME",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "YOUR_PASSWORD",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', body.token);",
+                  "  pm.collectionVariables.set('refreshToken', body.refreshToken);",
+                  "  pm.test('Login bem-sucedido', () => pm.response.to.have.status(200));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/auth/login", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","login"]}
+          }
+        },
+        {
+          "name": "Registrar Usuário",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"novo.usuario\",\n  \"email\": \"novo@exemplo.com\",\n  \"name\": \"Novo Usuário\",\n  \"password\": \"Senha123!\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/auth/register", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","register"]}
+          }
+        },
+        {
+          "name": "Renovar Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', body.token);",
+                  "  pm.collectionVariables.set('refreshToken', body.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/auth/refresh", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","refresh"]}
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/auth/logout", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","logout"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuários",
+      "item": [
+        {
+          "name": "Listar Usuários",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/users", "host": ["{{baseUrl}}"], "path": ["api","v1","users"]}
+          }
+        },
+        {
+          "name": "Buscar Usuário por ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/users/1", "host": ["{{baseUrl}}"], "path": ["api","v1","users","1"]}
+          }
+        },
+        {
+          "name": "Atualizar Usuário",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nome Atualizado\",\n  \"email\": \"atualizado@exemplo.com\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/users/1", "host": ["{{baseUrl}}"], "path": ["api","v1","users","1"]}
+          }
+        },
+        {
+          "name": "Excluir Usuário",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "{{baseUrl}}/api/v1/users/2", "host": ["{{baseUrl}}"], "path": ["api","v1","users","2"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Listar Clientes",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/clients", "host": ["{{baseUrl}}"], "path": ["api","v1","clients"]}
+          }
+        },
+        {
+          "name": "Buscar por Nome",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/clients?name=João",
+              "host": ["{{baseUrl}}"], "path": ["api","v1","clients"],
+              "query": [{"key": "name", "value": "João"}]
+            }
+          }
+        },
+        {
+          "name": "Buscar por Documento",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/clients?document=123.456.789-00",
+              "host": ["{{baseUrl}}"], "path": ["api","v1","clients"],
+              "query": [{"key": "document", "value": "123.456.789-00"}]
+            }
+          }
+        },
+        {
+          "name": "Buscar Cliente por ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/clients/1", "host": ["{{baseUrl}}"], "path": ["api","v1","clients","1"]}
+          }
+        },
+        {
+          "name": "Criar Cliente",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria Silva\",\n  \"email\": \"maria@exemplo.com\",\n  \"phone\": \"(11) 91234-5678\",\n  \"document\": \"123.456.789-00\",\n  \"address\": \"Rua das Flores, 123\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"zipCode\": \"01310-100\",\n  \"active\": true\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/clients", "host": ["{{baseUrl}}"], "path": ["api","v1","clients"]}
+          }
+        },
+        {
+          "name": "Atualizar Cliente",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria Silva Atualizada\",\n  \"phone\": \"(11) 98765-4321\",\n  \"active\": true\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/clients/1", "host": ["{{baseUrl}}"], "path": ["api","v1","clients","1"]}
+          }
+        },
+        {
+          "name": "Excluir Cliente",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "{{baseUrl}}/api/v1/clients/1", "host": ["{{baseUrl}}"], "path": ["api","v1","clients","1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Produtos",
+      "item": [
+        {
+          "name": "Listar Produtos",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/products", "host": ["{{baseUrl}}"], "path": ["api","v1","products"]}
+          }
+        },
+        {
+          "name": "Buscar Produto por ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/products/1", "host": ["{{baseUrl}}"], "path": ["api","v1","products","1"]}
+          }
+        },
+        {
+          "name": "Buscar Produto por Código",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/products/code/PROD001", "host": ["{{baseUrl}}"], "path": ["api","v1","products","code","PROD001"]}
+          }
+        },
+        {
+          "name": "Criar Produto",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"PROD001\",\n  \"name\": \"Tela LCD 15.6\",\n  \"description\": \"Tela LCD para notebook 15.6 polegadas\",\n  \"type\": \"PRODUCT\",\n  \"price\": 299.90,\n  \"cost\": 150.00,\n  \"stockQty\": 10,\n  \"unit\": \"un\",\n  \"active\": true\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/products", "host": ["{{baseUrl}}"], "path": ["api","v1","products"]}
+          }
+        },
+        {
+          "name": "Atualizar Produto",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tela LCD 15.6 Full HD\",\n  \"price\": 349.90,\n  \"stockQty\": 15,\n  \"type\": \"PRODUCT\",\n  \"active\": true\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/products/1", "host": ["{{baseUrl}}"], "path": ["api","v1","products","1"]}
+          }
+        },
+        {
+          "name": "Excluir Produto",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "{{baseUrl}}/api/v1/products/1", "host": ["{{baseUrl}}"], "path": ["api","v1","products","1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ordens de Serviço",
+      "item": [
+        {
+          "name": "Listar OS",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/service-orders", "host": ["{{baseUrl}}"], "path": ["api","v1","service-orders"]}
+          }
+        },
+        {
+          "name": "Buscar OS por ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/service-orders/1", "host": ["{{baseUrl}}"], "path": ["api","v1","service-orders","1"]}
+          }
+        },
+        {
+          "name": "Criar OS",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"technicianId\": 1,\n  \"status\": \"OPEN\",\n  \"priority\": \"MEDIUM\",\n  \"description\": \"Notebook não liga após queda\",\n  \"laborCost\": 120.00,\n  \"estimatedCompletion\": \"2024-02-15\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/service-orders", "host": ["{{baseUrl}}"], "path": ["api","v1","service-orders"]}
+          }
+        },
+        {
+          "name": "Atualizar OS",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"status\": \"IN_PROGRESS\",\n  \"priority\": \"HIGH\",\n  \"description\": \"Notebook não liga após queda\",\n  \"diagnosis\": \"Placa-mãe danificada\",\n  \"laborCost\": 250.00\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/service-orders/1", "host": ["{{baseUrl}}"], "path": ["api","v1","service-orders","1"]}
+          }
+        },
+        {
+          "name": "Alterar Status da OS",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/service-orders/1/status?status=COMPLETED",
+              "host": ["{{baseUrl}}"], "path": ["api","v1","service-orders","1","status"],
+              "query": [{"key": "status", "value": "COMPLETED"}]
+            }
+          }
+        },
+        {
+          "name": "Listar Notas da OS",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/service-orders/1/notes", "host": ["{{baseUrl}}"], "path": ["api","v1","service-orders","1","notes"]}
+          }
+        },
+        {
+          "name": "Adicionar Nota à OS",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Cliente informou que o equipamento caiu de uma altura de 1 metro\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/service-orders/1/notes", "host": ["{{baseUrl}}"], "path": ["api","v1","service-orders","1","notes"]}
+          }
+        },
+        {
+          "name": "Excluir OS",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "{{baseUrl}}/api/v1/service-orders/1", "host": ["{{baseUrl}}"], "path": ["api","v1","service-orders","1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vendas",
+      "item": [
+        {
+          "name": "Listar Vendas",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/sales", "host": ["{{baseUrl}}"], "path": ["api","v1","sales"]}
+          }
+        },
+        {
+          "name": "Buscar Venda por ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/sales/1", "host": ["{{baseUrl}}"], "path": ["api","v1","sales","1"]}
+          }
+        },
+        {
+          "name": "Criar Venda",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"sellerId\": 1,\n  \"status\": \"OPEN\",\n  \"discount\": 0.00,\n  \"notes\": \"Venda balcão\",\n  \"saleDate\": \"2024-01-15\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/sales", "host": ["{{baseUrl}}"], "path": ["api","v1","sales"]}
+          }
+        },
+        {
+          "name": "Adicionar Item à Venda",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": 1,\n  \"quantity\": 2,\n  \"unitPrice\": 299.90\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/sales/1/items", "host": ["{{baseUrl}}"], "path": ["api","v1","sales","1","items"]}
+          }
+        },
+        {
+          "name": "Remover Item da Venda",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "{{baseUrl}}/api/v1/sales/1/items/1", "host": ["{{baseUrl}}"], "path": ["api","v1","sales","1","items","1"]}
+          }
+        },
+        {
+          "name": "Alterar Status da Venda",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/sales/1/status?status=CLOSED",
+              "host": ["{{baseUrl}}"], "path": ["api","v1","sales","1","status"],
+              "query": [{"key": "status", "value": "CLOSED"}]
+            }
+          }
+        },
+        {
+          "name": "Excluir Venda",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "{{baseUrl}}/api/v1/sales/1", "host": ["{{baseUrl}}"], "path": ["api","v1","sales","1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cobranças",
+      "item": [
+        {
+          "name": "Listar Cobranças",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/charges", "host": ["{{baseUrl}}"], "path": ["api","v1","charges"]}
+          }
+        },
+        {
+          "name": "Buscar Cobrança por ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/charges/1", "host": ["{{baseUrl}}"], "path": ["api","v1","charges","1"]}
+          }
+        },
+        {
+          "name": "Criar Cobrança",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"referenceId\": 1,\n  \"referenceType\": \"SERVICE_ORDER\",\n  \"amount\": 350.00,\n  \"dueDate\": \"2024-02-28\",\n  \"status\": \"PENDING\",\n  \"method\": \"PIX\",\n  \"notes\": \"Cobrança referente à OS #1\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/charges", "host": ["{{baseUrl}}"], "path": ["api","v1","charges"]}
+          }
+        },
+        {
+          "name": "Alterar Status da Cobrança",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/charges/1/status?status=PAID",
+              "host": ["{{baseUrl}}"], "path": ["api","v1","charges","1","status"],
+              "query": [{"key": "status", "value": "PAID"}]
+            }
+          }
+        },
+        {
+          "name": "Excluir Cobrança",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "{{baseUrl}}/api/v1/charges/1", "host": ["{{baseUrl}}"], "path": ["api","v1","charges","1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Financeiro",
+      "item": [
+        {
+          "name": "Listar Categorias",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/financial/categories", "host": ["{{baseUrl}}"], "path": ["api","v1","financial","categories"]}
+          }
+        },
+        {
+          "name": "Criar Categoria",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Serviços de TI\",\n  \"type\": \"INCOME\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/financial/categories", "host": ["{{baseUrl}}"], "path": ["api","v1","financial","categories"]}
+          }
+        },
+        {
+          "name": "Listar Contas",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/financial/accounts", "host": ["{{baseUrl}}"], "path": ["api","v1","financial","accounts"]}
+          }
+        },
+        {
+          "name": "Criar Conta",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Conta Corrente Bradesco\",\n  \"type\": \"CHECKING\",\n  \"initialBalance\": 5000.00\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/financial/accounts", "host": ["{{baseUrl}}"], "path": ["api","v1","financial","accounts"]}
+          }
+        },
+        {
+          "name": "Listar Lançamentos",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/financial/entries", "host": ["{{baseUrl}}"], "path": ["api","v1","financial","entries"]}
+          }
+        },
+        {
+          "name": "Criar Lançamento",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountId\": 1,\n  \"categoryId\": 1,\n  \"type\": \"INCOME\",\n  \"amount\": 350.00,\n  \"description\": \"Recebimento OS #1\",\n  \"entryDate\": \"2024-01-15\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/financial/entries", "host": ["{{baseUrl}}"], "path": ["api","v1","financial","entries"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Resumo",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/dashboard/summary", "host": ["{{baseUrl}}"], "path": ["api","v1","dashboard","summary"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Configurações do Sistema",
+      "item": [
+        {
+          "name": "Listar Configurações",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/system-config", "host": ["{{baseUrl}}"], "path": ["api","v1","system-config"]}
+          }
+        },
+        {
+          "name": "Buscar Configuração por Chave",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/system-config/company.name", "host": ["{{baseUrl}}"], "path": ["api","v1","system-config","company.name"]}
+          }
+        },
+        {
+          "name": "Atualizar Configuração",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": \"Minha Empresa Ltda\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/system-config/company.name", "host": ["{{baseUrl}}"], "path": ["api","v1","system-config","company.name"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auditoria",
+      "item": [
+        {
+          "name": "Listar Logs",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/audit", "host": ["{{baseUrl}}"], "path": ["api","v1","audit"]}
+          }
+        },
+        {
+          "name": "Logs por Usuário",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/audit/user/admin", "host": ["{{baseUrl}}"], "path": ["api","v1","audit","user","admin"]}
+          }
+        },
+        {
+          "name": "Logs por Entidade",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/v1/audit/entity/CLIENT/1", "host": ["{{baseUrl}}"], "path": ["api","v1","audit","entity","CLIENT","1"]}
+          }
+        }
+      ]
+    }
+  ]
+}
