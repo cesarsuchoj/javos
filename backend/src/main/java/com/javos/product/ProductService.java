@@ -15,14 +15,17 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    @Transactional(readOnly = true)
     public List<ProductResponse> findAll() {
         return productRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public ProductResponse findById(Long id) {
         return toResponse(getProduct(id));
     }
 
+    @Transactional(readOnly = true)
     public ProductResponse findByCode(String code) {
         return toResponse(productRepository.findByCode(code).orElseThrow(() -> new ResourceNotFoundException("Product not found with code: " + code)));
     }
@@ -65,6 +68,7 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    @Transactional(readOnly = true)
     public List<ProductResponse> searchByName(String name) {
         return productRepository.findByNameContainingIgnoreCase(name).stream().map(this::toResponse).collect(Collectors.toList());
     }

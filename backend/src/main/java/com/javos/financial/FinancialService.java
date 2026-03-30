@@ -17,10 +17,12 @@ public class FinancialService {
     private final AccountRepository accountRepository;
     private final FinancialEntryRepository entryRepository;
 
+    @Transactional(readOnly = true)
     public List<CategoryResponse> findAllCategories() {
         return categoryRepository.findAll().stream().map(this::toCategoryResponse).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public CategoryResponse findCategoryById(Long id) {
         return toCategoryResponse(getCategory(id));
     }
@@ -51,10 +53,12 @@ public class FinancialService {
         categoryRepository.delete(getCategory(id));
     }
 
+    @Transactional(readOnly = true)
     public List<AccountResponse> findAllAccounts() {
         return accountRepository.findAll().stream().map(this::toAccountResponse).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public AccountResponse findAccountById(Long id) {
         return toAccountResponse(getAccount(id));
     }
@@ -85,10 +89,12 @@ public class FinancialService {
         accountRepository.delete(getAccount(id));
     }
 
+    @Transactional(readOnly = true)
     public List<FinancialEntryResponse> findAllEntries() {
         return entryRepository.findAll().stream().map(this::toEntryResponse).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public FinancialEntryResponse findEntryById(Long id) {
         return toEntryResponse(getEntry(id));
     }
