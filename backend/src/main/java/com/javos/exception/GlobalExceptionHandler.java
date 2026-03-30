@@ -9,7 +9,9 @@
  */
 package com.javos.exception;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -21,14 +23,33 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.LocaleResolver;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final MessageSource messageSource;
+    private final LocaleResolver localeResolver;
+
+    private Locale resolveLocale(HttpServletRequest request) {
+        try {
+            return localeResolver.resolveLocale(request);
+        } catch (Exception e) {
+            return Locale.of("pt", "BR");
+        }
+    }
+
+    private String msg(String code, HttpServletRequest request, Object... args) {
+        return messageSource.getMessage(code, args, resolveLocale(request));
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
@@ -43,25 +64,30 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex,
+                                                               HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED.value(), "Credenciais inválidas"));
+                .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED.value(),
+                        msg("error.invalid.credentials", request)));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex,
+                                                           HttpServletRequest request) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String field = ((FieldError) error).getField();
             errors.put(field, error.getDefaultMessage());
         });
-        ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST.value(), "Erro de validação");
+        ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST.value(),
+                msg("error.validation", request));
         response.setDetails(errors);
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler({DataIntegrityViolationException.class, JpaSystemException.class})
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(RuntimeException ex) {
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(RuntimeException ex,
+                                                                       HttpServletRequest request) {
         Throwable cause = ex.getCause();
         while (cause != null && cause.getCause() != null) {
             cause = cause.getCause();
@@ -70,11 +96,13 @@ public class GlobalExceptionHandler {
         if (causeMsg != null && causeMsg.toUpperCase().contains("CONSTRAINT")) {
             log.warn("Data integrity violation: {}", causeMsg);
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ErrorResponse.of(HttpStatus.CONFLICT.value(), "Operação viola a integridade dos dados"));
+                    .body(ErrorResponse.of(HttpStatus.CONFLICT.value(),
+                            msg("error.data.integrity", request)));
         }
-        log.error("Erro não tratado: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        log.error("Unhandled error: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro interno do servidor"));
+                .body(ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        msg("error.internal", request)));
     }
 
     @ExceptionHandler(IllegalStateException.class)
@@ -84,24 +112,28 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex,
+                                                             HttpServletRequest request) {
         // Do not echo the user-supplied value back to avoid information exposure
-        String message = "Valor inválido para o parâmetro '" + ex.getName() + "'";
+        String message = msg("error.invalid.parameter", request, ex.getName());
         return ResponseEntity.badRequest()
                 .body(ErrorResponse.of(HttpStatus.BAD_REQUEST.value(), message));
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAuthorizationDenied(AuthorizationDeniedException ex) {
+    public ResponseEntity<ErrorResponse> handleAuthorizationDenied(AuthorizationDeniedException ex,
+                                                                    HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(ErrorResponse.of(HttpStatus.FORBIDDEN.value(), "Acesso negado"));
+                .body(ErrorResponse.of(HttpStatus.FORBIDDEN.value(),
+                        msg("error.access.denied", request)));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
-        log.error("Erro não tratado: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
+    public ResponseEntity<ErrorResponse> handleGeneral(Exception ex, HttpServletRequest request) {
+        log.error("Unhandled error: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro interno do servidor"));
+                .body(ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        msg("error.internal", request)));
     }
 
     public static class ErrorResponse {
