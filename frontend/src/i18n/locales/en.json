@@ -1,0 +1,328 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "close": "Close",
+    "active": "Active",
+    "inactive": "Inactive",
+    "active_f": "Active",
+    "inactive_f": "Inactive",
+    "wait": "Please wait...",
+    "actions": "Actions",
+    "status": "Status",
+    "name": "Name",
+    "type": "Type",
+    "description": "Description",
+    "notes": "Notes",
+    "closeNotification": "Close notification",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "clients": "Clients",
+    "products": "Products",
+    "serviceOrders": "Service Orders",
+    "financial": "Financial"
+  },
+  "auth": {
+    "title": "Javos",
+    "subtitle": "Management System",
+    "username": "Username",
+    "password": "Password",
+    "login": "Sign In",
+    "loggingIn": "Signing in...",
+    "usernamePlaceholder": "Enter your username",
+    "passwordPlaceholder": "Enter your password",
+    "usernameRequired": "Username is required.",
+    "passwordRequired": "Password is required."
+  },
+  "header": {
+    "logout": "Sign Out",
+    "tagline": "Management System"
+  },
+  "dashboard": {
+    "title": "System Summary",
+    "totalUsers": "Total Users",
+    "loggedUser": "Logged User",
+    "version": "Version",
+    "retry": "Retry"
+  },
+  "clients": {
+    "title": "Clients",
+    "newClient": "+ New Client",
+    "searchPlaceholder": "Search by name, email or document…",
+    "nameRequired": "Name is required.",
+    "created": "Client created successfully.",
+    "updated": "Client updated successfully.",
+    "deleted": "Client \"{{name}}\" deleted successfully.",
+    "deleteConfirm": "Delete client \"{{name}}\"? This action cannot be undone.",
+    "notFound": "No clients found.",
+    "editTitle": "Edit Client",
+    "createTitle": "New Client",
+    "fields": {
+      "name": "Name *",
+      "email": "Email",
+      "phone": "Phone",
+      "document": "Document",
+      "zipCode": "ZIP Code",
+      "address": "Address",
+      "city": "City",
+      "state": "State",
+      "notes": "Notes",
+      "active": "Active"
+    },
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "document": "Document",
+      "cityState": "City / State",
+      "status": "Status",
+      "actions": "Actions"
+    }
+  },
+  "products": {
+    "title": "Products",
+    "newProduct": "+ New Product",
+    "searchPlaceholder": "Search by name or code…",
+    "nameRequired": "Name is required.",
+    "priceRequired": "Enter a valid price.",
+    "created": "Product created successfully.",
+    "updated": "Product updated successfully.",
+    "deleted": "Product \"{{name}}\" deleted successfully.",
+    "deleteConfirm": "Delete product \"{{name}}\"? This action cannot be undone.",
+    "notFound": "No products found.",
+    "editTitle": "Edit Product",
+    "createTitle": "New Product",
+    "types": {
+      "PRODUCT": "Product",
+      "SERVICE": "Service"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "Name *",
+      "type": "Type *",
+      "description": "Description",
+      "price": "Price *",
+      "cost": "Cost",
+      "stockQty": "Stock",
+      "unit": "Unit",
+      "active": "Active"
+    },
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "type": "Type",
+      "price": "Price",
+      "stock": "Stock",
+      "status": "Status",
+      "actions": "Actions"
+    }
+  },
+  "serviceOrders": {
+    "title": "Service Orders",
+    "newOrder": "+ New Order",
+    "searchPlaceholder": "Search by number, client or description…",
+    "clientRequired": "Select a client.",
+    "descriptionRequired": "Description is required.",
+    "created": "Service order created successfully.",
+    "updated": "Service order updated successfully.",
+    "deleted": "Order \"{{id}}\" deleted successfully.",
+    "deleteConfirm": "Delete order \"{{id}}\"? This action cannot be undone.",
+    "notFound": "No service orders found.",
+    "editTitle": "Edit Order {{id}}",
+    "createTitle": "New Service Order",
+    "selectClient": "Select a client…",
+    "status": {
+      "OPEN": "Open",
+      "IN_PROGRESS": "In Progress",
+      "WAITING_PARTS": "Waiting for Parts",
+      "DONE": "Done",
+      "CLOSED": "Closed",
+      "CANCELLED": "Cancelled"
+    },
+    "priority": {
+      "LOW": "Low",
+      "NORMAL": "Normal",
+      "HIGH": "High",
+      "URGENT": "Urgent"
+    },
+    "fields": {
+      "client": "Client *",
+      "status": "Status",
+      "priority": "Priority",
+      "description": "Description *",
+      "diagnosis": "Diagnosis",
+      "solution": "Solution",
+      "laborCost": "Labor Cost",
+      "estimatedCompletion": "Estimated Completion"
+    },
+    "columns": {
+      "orderNumber": "Order #",
+      "client": "Client",
+      "description": "Description",
+      "status": "Status",
+      "priority": "Priority",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    }
+  },
+  "financial": {
+    "title": "Financial",
+    "tabs": {
+      "charges": "Charges",
+      "accounts": "Accounts",
+      "categories": "Categories",
+      "entries": "Entries"
+    },
+    "chargeStatus": {
+      "PENDING": "Pending",
+      "SENT": "Sent",
+      "PAID": "Paid",
+      "OVERDUE": "Overdue",
+      "CANCELLED": "Cancelled"
+    },
+    "chargeMethod": {
+      "BOLETO": "Bank Slip",
+      "PIX": "Pix",
+      "CREDIT_CARD": "Credit Card",
+      "BANK_TRANSFER": "Bank Transfer",
+      "CASH": "Cash"
+    },
+    "accountType": {
+      "CHECKING": "Checking",
+      "SAVINGS": "Savings",
+      "CASH": "Cash",
+      "CREDIT_CARD": "Credit Card"
+    },
+    "entryType": {
+      "INCOME": "Income",
+      "EXPENSE": "Expense"
+    },
+    "charges": {
+      "newCharge": "+ New Charge",
+      "notFound": "No charges found.",
+      "amountRequired": "Enter a valid amount.",
+      "created": "Charge created successfully.",
+      "updated": "Charge updated successfully.",
+      "deleted": "Charge deleted successfully.",
+      "deleteConfirm": "Delete this charge of {{amount}}? This action cannot be undone.",
+      "editTitle": "Edit Charge",
+      "createTitle": "New Charge",
+      "noClient": "No client",
+      "noMethod": "Not specified",
+      "fields": {
+        "client": "Client",
+        "amount": "Amount *",
+        "dueDate": "Due Date",
+        "status": "Status",
+        "method": "Method",
+        "notes": "Notes"
+      },
+      "columns": {
+        "client": "Client",
+        "amount": "Amount",
+        "dueDate": "Due Date",
+        "status": "Status",
+        "method": "Method",
+        "actions": "Actions"
+      }
+    },
+    "accounts": {
+      "newAccount": "+ New Account",
+      "notFound": "No accounts found.",
+      "nameRequired": "Name is required.",
+      "created": "Account created successfully.",
+      "updated": "Account updated successfully.",
+      "deleted": "Account \"{{name}}\" deleted successfully.",
+      "deleteConfirm": "Delete account \"{{name}}\"? This action cannot be undone.",
+      "editTitle": "Edit Account",
+      "createTitle": "New Account",
+      "fields": {
+        "name": "Name *",
+        "type": "Type *",
+        "balance": "Balance",
+        "active": "Active"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "balance": "Balance",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "categories": {
+      "newCategory": "+ New Category",
+      "notFound": "No categories found.",
+      "nameRequired": "Name is required.",
+      "created": "Category created successfully.",
+      "updated": "Category updated successfully.",
+      "deleted": "Category \"{{name}}\" deleted successfully.",
+      "deleteConfirm": "Delete category \"{{name}}\"? This action cannot be undone.",
+      "editTitle": "Edit Category",
+      "createTitle": "New Category",
+      "fields": {
+        "name": "Name *",
+        "type": "Type *",
+        "description": "Description",
+        "active": "Active"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "description": "Description",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "entries": {
+      "newEntry": "+ New Entry",
+      "notFound": "No entries found.",
+      "descriptionRequired": "Description is required.",
+      "amountRequired": "Enter a valid amount.",
+      "created": "Entry created successfully.",
+      "updated": "Entry updated successfully.",
+      "deleted": "Entry \"{{description}}\" deleted successfully.",
+      "deleteConfirm": "Delete entry \"{{description}}\"? This action cannot be undone.",
+      "editTitle": "Edit Entry",
+      "createTitle": "New Entry",
+      "paid": "Paid",
+      "fields": {
+        "description": "Description *",
+        "amount": "Amount *",
+        "type": "Type *",
+        "dueDate": "Due Date",
+        "paymentDate": "Payment Date",
+        "category": "Category",
+        "account": "Account",
+        "notes": "Notes",
+        "paid": "Paid",
+        "noCategory": "No category",
+        "noAccount": "No account"
+      },
+      "columns": {
+        "description": "Description",
+        "type": "Type",
+        "amount": "Amount",
+        "dueDate": "Due Date",
+        "paid": "Paid",
+        "category": "Category",
+        "account": "Account",
+        "actions": "Actions"
+      }
+    }
+  },
+  "language": {
+    "label": "Language",
+    "pt-BR": "Português",
+    "en": "English",
+    "es": "Español"
+  }
+}

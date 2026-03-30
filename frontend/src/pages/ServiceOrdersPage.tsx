@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useServiceOrderStore } from '../store/serviceOrderStore'
 import { useClientStore } from '../store/clientStore'
 import {
@@ -9,25 +10,10 @@ import {
 } from '../types'
 import { getErrorMessage } from '../services/api'
 import { useNotification } from '../hooks/useNotification'
+import { formatDate } from '../i18n/locale'
 import Modal from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import styles from './crud.module.css'
-
-const statusLabels: Record<ServiceOrderStatus, string> = {
-  OPEN: 'Aberta',
-  IN_PROGRESS: 'Em Andamento',
-  WAITING_PARTS: 'Aguardando Peças',
-  DONE: 'Concluída',
-  CLOSED: 'Fechada',
-  CANCELLED: 'Cancelada',
-}
-
-const priorityLabels: Record<ServiceOrderPriority, string> = {
-  LOW: 'Baixa',
-  NORMAL: 'Normal',
-  HIGH: 'Alta',
-  URGENT: 'Urgente',
-}
 
 const statusColors: Record<ServiceOrderStatus, string> = {
   OPEN: '#ebf8ff',
@@ -59,6 +45,7 @@ const emptyForm: ServiceOrderRequest = {
 }
 
 export default function ServiceOrdersPage() {
+  const { t } = useTranslation()
   const {
     serviceOrders,
     loading,
@@ -119,11 +106,11 @@ export default function ServiceOrdersPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.clientId) {
-      setFormError('Selecione um cliente.')
+      setFormError(t('serviceOrders.clientRequired'))
       return
     }
     if (!form.description.trim()) {
-      setFormError('A descrição é obrigatória.')
+      setFormError(t('serviceOrders.descriptionRequired'))
       return
     }
     setSaving(true)
@@ -131,10 +118,10 @@ export default function ServiceOrdersPage() {
     try {
       if (editing) {
         await update(editing.id, form)
-        notify('success', 'Ordem de serviço atualizada com sucesso.')
+        notify('success', t('serviceOrders.updated'))
       } else {
         await create(form)
-        notify('success', 'Ordem de serviço criada com sucesso.')
+        notify('success', t('serviceOrders.created'))
       }
       setModalOpen(false)
     } catch (err) {
@@ -149,7 +136,7 @@ export default function ServiceOrdersPage() {
     setDeleting(true)
     try {
       await remove(deleteTarget.id)
-      notify('success', `OS "${deleteTarget.orderNumber || `#${deleteTarget.id}`}" excluída com sucesso.`)
+      notify('success', t('serviceOrders.deleted', { id: deleteTarget.orderNumber || `#${deleteTarget.id}` }))
     } catch (err) {
       notify('error', getErrorMessage(err))
     } finally {
@@ -161,17 +148,17 @@ export default function ServiceOrdersPage() {
   return (
     <div className={styles.container}>
       <div className={styles.pageHeader}>
-        <h2 className={styles.title}>Ordens de Serviço</h2>
+        <h2 className={styles.title}>{t('serviceOrders.title')}</h2>
         <div className={styles.toolbar}>
           <input
             className={styles.searchInput}
             type="search"
-            placeholder="Buscar por nº, cliente ou descrição…"
+            placeholder={t('serviceOrders.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <button className={styles.addBtn} onClick={openCreate}>
-            + Nova OS
+            {t('serviceOrders.newOrder')}
           </button>
         </div>
       </div>
@@ -185,7 +172,7 @@ export default function ServiceOrdersPage() {
           <button
             className={styles.notificationClose}
             onClick={clearNotification}
-            aria-label="Fechar notificação"
+            aria-label={t('common.closeNotification')}
           >
             ✕
           </button>
@@ -204,27 +191,27 @@ export default function ServiceOrdersPage() {
       {loading ? (
         <div className={styles.loading}>
           <span className={styles.spinner} aria-hidden="true" />
-          Carregando...
+          {t('common.loading')}
         </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Nº OS</th>
-                <th>Cliente</th>
-                <th>Descrição</th>
-                <th>Status</th>
-                <th>Prioridade</th>
-                <th>Criada em</th>
-                <th>Ações</th>
+                <th>{t('serviceOrders.columns.orderNumber')}</th>
+                <th>{t('serviceOrders.columns.client')}</th>
+                <th>{t('serviceOrders.columns.description')}</th>
+                <th>{t('serviceOrders.columns.status')}</th>
+                <th>{t('serviceOrders.columns.priority')}</th>
+                <th>{t('serviceOrders.columns.createdAt')}</th>
+                <th>{t('serviceOrders.columns.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className={styles.emptyState}>
-                    Nenhuma ordem de serviço encontrada.
+                    {t('serviceOrders.notFound')}
                   </td>
                 </tr>
               ) : (
@@ -250,14 +237,12 @@ export default function ServiceOrdersPage() {
                           color: statusTextColors[order.status],
                         }}
                       >
-                        {statusLabels[order.status]}
+                        {t(`serviceOrders.status.${order.status}`)}
                       </span>
                     </td>
-                    <td>{priorityLabels[order.priority]}</td>
+                    <td>{t(`serviceOrders.priority.${order.priority}`)}</td>
                     <td>
-                      {order.createdAt
-                        ? new Date(order.createdAt).toLocaleDateString('pt-BR')
-                        : '—'}
+                      {formatDate(order.createdAt)}
                     </td>
                     <td>
                       <div className={styles.actions}>
@@ -265,13 +250,13 @@ export default function ServiceOrdersPage() {
                           className={styles.editBtn}
                           onClick={() => openEdit(order)}
                         >
-                          Editar
+                          {t('common.edit')}
                         </button>
                         <button
                           className={styles.deleteBtn}
                           onClick={() => setDeleteTarget(order)}
                         >
-                          Excluir
+                          {t('common.delete')}
                         </button>
                       </div>
                     </td>
@@ -285,14 +270,14 @@ export default function ServiceOrdersPage() {
 
       {modalOpen && (
         <Modal
-          title={editing ? `Editar OS ${editing.orderNumber || `#${editing.id}`}` : 'Nova Ordem de Serviço'}
+          title={editing ? t('serviceOrders.editTitle', { id: editing.orderNumber || `#${editing.id}` }) : t('serviceOrders.createTitle')}
           onClose={() => setModalOpen(false)}
         >
           <form className={styles.form} onSubmit={handleSubmit}>
             {formError && <div className={styles.formError}>{formError}</div>}
             <div className={styles.formRow}>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="os-client">Cliente *</label>
+                <label htmlFor="os-client">{t('serviceOrders.fields.client')}</label>
                 <select
                   id="os-client"
                   required
@@ -301,7 +286,7 @@ export default function ServiceOrdersPage() {
                     setForm({ ...form, clientId: parseInt(e.target.value) || 0 })
                   }
                 >
-                  <option value="">Selecione um cliente…</option>
+                  <option value="">{t('serviceOrders.selectClient')}</option>
                   {clients.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -310,7 +295,7 @@ export default function ServiceOrdersPage() {
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="os-status">Status</label>
+                <label htmlFor="os-status">{t('serviceOrders.fields.status')}</label>
                 <select
                   id="os-status"
                   value={form.status}
@@ -318,15 +303,15 @@ export default function ServiceOrdersPage() {
                     setForm({ ...form, status: e.target.value as ServiceOrderStatus })
                   }
                 >
-                  {(Object.keys(statusLabels) as ServiceOrderStatus[]).map((s) => (
+                  {(['OPEN', 'IN_PROGRESS', 'WAITING_PARTS', 'DONE', 'CLOSED', 'CANCELLED'] as ServiceOrderStatus[]).map((s) => (
                     <option key={s} value={s}>
-                      {statusLabels[s]}
+                      {t(`serviceOrders.status.${s}`)}
                     </option>
                   ))}
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="os-priority">Prioridade</label>
+                <label htmlFor="os-priority">{t('serviceOrders.fields.priority')}</label>
                 <select
                   id="os-priority"
                   value={form.priority}
@@ -334,15 +319,15 @@ export default function ServiceOrdersPage() {
                     setForm({ ...form, priority: e.target.value as ServiceOrderPriority })
                   }
                 >
-                  {(Object.keys(priorityLabels) as ServiceOrderPriority[]).map((p) => (
+                  {(['LOW', 'NORMAL', 'HIGH', 'URGENT'] as ServiceOrderPriority[]).map((p) => (
                     <option key={p} value={p}>
-                      {priorityLabels[p]}
+                      {t(`serviceOrders.priority.${p}`)}
                     </option>
                   ))}
                 </select>
               </div>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="os-description">Descrição *</label>
+                <label htmlFor="os-description">{t('serviceOrders.fields.description')}</label>
                 <textarea
                   id="os-description"
                   required
@@ -351,7 +336,7 @@ export default function ServiceOrdersPage() {
                 />
               </div>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="os-diagnosis">Diagnóstico</label>
+                <label htmlFor="os-diagnosis">{t('serviceOrders.fields.diagnosis')}</label>
                 <textarea
                   id="os-diagnosis"
                   value={form.diagnosis}
@@ -359,7 +344,7 @@ export default function ServiceOrdersPage() {
                 />
               </div>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="os-solution">Solução</label>
+                <label htmlFor="os-solution">{t('serviceOrders.fields.solution')}</label>
                 <textarea
                   id="os-solution"
                   value={form.solution}
@@ -367,7 +352,7 @@ export default function ServiceOrdersPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="os-labor">Mão de Obra (R$)</label>
+                <label htmlFor="os-labor">{t('serviceOrders.fields.laborCost')}</label>
                 <input
                   id="os-labor"
                   type="number"
@@ -380,7 +365,7 @@ export default function ServiceOrdersPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="os-eta">Previsão de Conclusão</label>
+                <label htmlFor="os-eta">{t('serviceOrders.fields.estimatedCompletion')}</label>
                 <input
                   id="os-eta"
                   type="date"
@@ -397,10 +382,10 @@ export default function ServiceOrdersPage() {
                 className={styles.cancelBtn}
                 onClick={() => setModalOpen(false)}
               >
-                Cancelar
+                {t('common.cancel')}
               </button>
               <button type="submit" className={styles.submitBtn} disabled={saving}>
-                {saving ? 'Salvando...' : 'Salvar'}
+                {saving ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </form>
@@ -409,7 +394,7 @@ export default function ServiceOrdersPage() {
 
       {deleteTarget && (
         <ConfirmDialog
-          message={`Deseja excluir a OS "${deleteTarget.orderNumber || `#${deleteTarget.id}`}"? Esta ação não pode ser desfeita.`}
+          message={t('serviceOrders.deleteConfirm', { id: deleteTarget.orderNumber || `#${deleteTarget.id}` })}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
           loading={deleting}

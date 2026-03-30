@@ -1,15 +1,18 @@
 import { NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import styles from './Sidebar.module.css'
 
-const navItems = [
-  { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { path: '/clients', label: 'Clientes', icon: '👥' },
-  { path: '/products', label: 'Produtos', icon: '📦' },
-  { path: '/service-orders', label: 'Ordens de Serviço', icon: '🔧' },
-  { path: '/financial', label: 'Financeiro', icon: '💰' },
-]
-
 export default function Sidebar() {
+  const { t } = useTranslation()
+
+  const navItems = [
+    { path: '/dashboard', label: t('nav.dashboard'), icon: '📊' },
+    { path: '/clients', label: t('nav.clients'), icon: '👥' },
+    { path: '/products', label: t('nav.products'), icon: '📦' },
+    { path: '/service-orders', label: t('nav.serviceOrders'), icon: '🔧' },
+    { path: '/financial', label: t('nav.financial'), icon: '💰' },
+  ]
+
   return (
     <aside className={styles.sidebar}>
       <nav className={styles.nav}>

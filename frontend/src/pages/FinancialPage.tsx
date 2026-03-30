@@ -468,8 +468,8 @@ function AccountsSection() {
                   value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value as AccountType })}
                 >
-                  {(['CHECKING', 'SAVINGS', 'CASH', 'CREDIT_CARD'] as AccountType[]).map((type) => (
-                    <option key={type} value={type}>{t(`financial.accountType.${type}`)}</option>
+                  {(['CHECKING', 'SAVINGS', 'CASH', 'CREDIT_CARD'] as AccountType[]).map((accountType) => (
+                    <option key={accountType} value={accountType}>{t(`financial.accountType.${accountType}`)}</option>
                   ))}
                 </select>
               </div>
@@ -686,8 +686,8 @@ function CategoriesSection() {
                   value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value as CategoryType })}
                 >
-                  {(['INCOME', 'EXPENSE'] as CategoryType[]).map((type) => (
-                    <option key={type} value={type}>{t(`financial.entryType.${type}`)}</option>
+                  {(['INCOME', 'EXPENSE'] as CategoryType[]).map((catType) => (
+                    <option key={catType} value={catType}>{t(`financial.entryType.${catType}`)}</option>
                   ))}
                 </select>
               </div>

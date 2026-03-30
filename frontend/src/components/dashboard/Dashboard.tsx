@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { dashboardService } from '../../services/dashboardService'
 import { getErrorMessage } from '../../services/api'
 import { DashboardSummary } from '../../types'
 import styles from './Dashboard.module.css'
 
 export default function Dashboard() {
+  const { t } = useTranslation()
   const [summary, setSummary] = useState<DashboardSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -26,7 +28,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className={styles.container}>
-        <h2 className={styles.title}>Resumo do Sistema</h2>
+        <h2 className={styles.title}>{t('dashboard.title')}</h2>
         <div className={styles.cards}>
           {[1, 2, 3].map((i) => (
             <div key={i} className={styles.card}>
@@ -37,7 +39,7 @@ export default function Dashboard() {
         </div>
         <p className={styles.loading}>
           <span className={styles.spinner} aria-hidden="true" />
-          Carregando...
+          {t('common.loading')}
         </p>
       </div>
     )
@@ -46,11 +48,11 @@ export default function Dashboard() {
   if (error) {
     return (
       <div className={styles.container}>
-        <h2 className={styles.title}>Resumo do Sistema</h2>
+        <h2 className={styles.title}>{t('dashboard.title')}</h2>
         <div className={styles.error} role="alert">
           {error}
           <button onClick={load} className={styles.retryBtn}>
-            Tentar novamente
+            {t('dashboard.retry')}
           </button>
         </div>
       </div>
@@ -59,18 +61,18 @@ export default function Dashboard() {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Resumo do Sistema</h2>
+      <h2 className={styles.title}>{t('dashboard.title')}</h2>
       <div className={styles.cards}>
         <div className={styles.card}>
-          <span className={styles.cardLabel}>Total de Usuários</span>
+          <span className={styles.cardLabel}>{t('dashboard.totalUsers')}</span>
           <span className={styles.cardValue}>{summary?.totalUsers ?? 0}</span>
         </div>
         <div className={styles.card}>
-          <span className={styles.cardLabel}>Usuário Logado</span>
+          <span className={styles.cardLabel}>{t('dashboard.loggedUser')}</span>
           <span className={styles.cardValue}>{summary?.loggedUser ?? '-'}</span>
         </div>
         <div className={styles.card}>
-          <span className={styles.cardLabel}>Versão</span>
+          <span className={styles.cardLabel}>{t('dashboard.version')}</span>
           <span className={styles.cardValue}>{summary?.version ?? '-'}</span>
         </div>
       </div>

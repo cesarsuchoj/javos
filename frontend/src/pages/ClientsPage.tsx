@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useClientStore } from '../store/clientStore'
 import { Client, ClientRequest } from '../types'
 import { getErrorMessage } from '../services/api'
@@ -21,6 +22,7 @@ const emptyForm: ClientRequest = {
 }
 
 export default function ClientsPage() {
+  const { t } = useTranslation()
   const { clients, loading, error, fetchAll, create, update, remove, clearError } =
     useClientStore()
 
@@ -73,7 +75,7 @@ export default function ClientsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name.trim()) {
-      setFormError('O nome é obrigatório.')
+      setFormError(t('clients.nameRequired'))
       return
     }
     setSaving(true)
@@ -81,10 +83,10 @@ export default function ClientsPage() {
     try {
       if (editing) {
         await update(editing.id, form)
-        notify('success', 'Cliente atualizado com sucesso.')
+        notify('success', t('clients.updated'))
       } else {
         await create(form)
-        notify('success', 'Cliente criado com sucesso.')
+        notify('success', t('clients.created'))
       }
       setModalOpen(false)
     } catch (err) {
@@ -99,7 +101,7 @@ export default function ClientsPage() {
     setDeleting(true)
     try {
       await remove(deleteTarget.id)
-      notify('success', `Cliente "${deleteTarget.name}" excluído com sucesso.`)
+      notify('success', t('clients.deleted', { name: deleteTarget.name }))
     } catch (err) {
       notify('error', getErrorMessage(err))
     } finally {
@@ -129,17 +131,17 @@ export default function ClientsPage() {
   return (
     <div className={styles.container}>
       <div className={styles.pageHeader}>
-        <h2 className={styles.title}>Clientes</h2>
+        <h2 className={styles.title}>{t('clients.title')}</h2>
         <div className={styles.toolbar}>
           <input
             className={styles.searchInput}
             type="search"
-            placeholder="Buscar por nome, e-mail ou documento…"
+            placeholder={t('clients.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <button className={styles.addBtn} onClick={openCreate}>
-            + Novo Cliente
+            {t('clients.newClient')}
           </button>
         </div>
       </div>
@@ -153,7 +155,7 @@ export default function ClientsPage() {
           <button
             className={styles.notificationClose}
             onClick={clearNotification}
-            aria-label="Fechar notificação"
+            aria-label={t('common.closeNotification')}
           >
             ✕
           </button>
@@ -172,27 +174,27 @@ export default function ClientsPage() {
       {loading ? (
         <div className={styles.loading}>
           <span className={styles.spinner} aria-hidden="true" />
-          Carregando...
+          {t('common.loading')}
         </div>
       ) : (
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Nome</th>
-                <th>E-mail</th>
-                <th>Telefone</th>
-                <th>Documento</th>
-                <th>Cidade / UF</th>
-                <th>Status</th>
-                <th>Ações</th>
+                <th>{t('clients.columns.name')}</th>
+                <th>{t('clients.columns.email')}</th>
+                <th>{t('clients.columns.phone')}</th>
+                <th>{t('clients.columns.document')}</th>
+                <th>{t('clients.columns.cityState')}</th>
+                <th>{t('clients.columns.status')}</th>
+                <th>{t('clients.columns.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className={styles.emptyState}>
-                    Nenhum cliente encontrado.
+                    {t('clients.notFound')}
                   </td>
                 </tr>
               ) : (
@@ -209,7 +211,7 @@ export default function ClientsPage() {
                       <span
                         className={`${styles.badge} ${client.active ? styles.badgeActive : styles.badgeInactive}`}
                       >
-                        {client.active ? 'Ativo' : 'Inativo'}
+                        {client.active ? t('common.active') : t('common.inactive')}
                       </span>
                     </td>
                     <td>
@@ -218,13 +220,13 @@ export default function ClientsPage() {
                           className={styles.editBtn}
                           onClick={() => openEdit(client)}
                         >
-                          Editar
+                          {t('common.edit')}
                         </button>
                         <button
                           className={styles.deleteBtn}
                           onClick={() => setDeleteTarget(client)}
                         >
-                          Excluir
+                          {t('common.delete')}
                         </button>
                       </div>
                     </td>
@@ -238,14 +240,14 @@ export default function ClientsPage() {
 
       {modalOpen && (
         <Modal
-          title={editing ? 'Editar Cliente' : 'Novo Cliente'}
+          title={editing ? t('clients.editTitle') : t('clients.createTitle')}
           onClose={() => setModalOpen(false)}
         >
           <form className={styles.form} onSubmit={handleSubmit}>
             {formError && <div className={styles.formError}>{formError}</div>}
             <div className={styles.formRow}>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="client-name">Nome *</label>
+                <label htmlFor="client-name">{t('clients.fields.name')}</label>
                 <input
                   id="client-name"
                   type="text"
@@ -255,12 +257,12 @@ export default function ClientsPage() {
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
               </div>
-              {field('email', 'E-mail', 'email', 100)}
-              {field('phone', 'Telefone', 'tel', 20)}
-              {field('document', 'CPF / CNPJ', 'text', 20)}
-              {field('zipCode', 'CEP', 'text', 10)}
+              {field('email', t('clients.fields.email'), 'email', 100)}
+              {field('phone', t('clients.fields.phone'), 'tel', 20)}
+              {field('document', t('clients.fields.document'), 'text', 20)}
+              {field('zipCode', t('clients.fields.zipCode'), 'text', 10)}
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="client-address">Endereço</label>
+                <label htmlFor="client-address">{t('clients.fields.address')}</label>
                 <input
                   id="client-address"
                   type="text"
@@ -269,9 +271,9 @@ export default function ClientsPage() {
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
                 />
               </div>
-              {field('city', 'Cidade', 'text', 100)}
+              {field('city', t('clients.fields.city'), 'text', 100)}
               <div className={styles.formGroup}>
-                <label htmlFor="client-state">UF</label>
+                <label htmlFor="client-state">{t('clients.fields.state')}</label>
                 <input
                   id="client-state"
                   type="text"
@@ -283,7 +285,7 @@ export default function ClientsPage() {
                 />
               </div>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="client-notes">Observações</label>
+                <label htmlFor="client-notes">{t('clients.fields.notes')}</label>
                 <textarea
                   id="client-notes"
                   value={form.notes}
@@ -298,7 +300,7 @@ export default function ClientsPage() {
                     onChange={(e) => setForm({ ...form, active: e.target.checked })}
                     style={{ marginRight: '0.5rem' }}
                   />
-                  Ativo
+                  {t('clients.fields.active')}
                 </label>
               </div>
             </div>
@@ -308,10 +310,10 @@ export default function ClientsPage() {
                 className={styles.cancelBtn}
                 onClick={() => setModalOpen(false)}
               >
-                Cancelar
+                {t('common.cancel')}
               </button>
               <button type="submit" className={styles.submitBtn} disabled={saving}>
-                {saving ? 'Salvando...' : 'Salvar'}
+                {saving ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </form>
@@ -320,7 +322,7 @@ export default function ClientsPage() {
 
       {deleteTarget && (
         <ConfirmDialog
-          message={`Deseja excluir o cliente "${deleteTarget.name}"? Esta ação não pode ser desfeita.`}
+          message={t('clients.deleteConfirm', { name: deleteTarget.name })}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
           loading={deleting}

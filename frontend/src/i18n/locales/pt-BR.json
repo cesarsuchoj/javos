@@ -1,0 +1,328 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "saving": "Salvando...",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "confirm": "Confirmar",
+    "close": "Fechar",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "active_f": "Ativa",
+    "inactive_f": "Inativa",
+    "wait": "Aguarde...",
+    "actions": "Ações",
+    "status": "Status",
+    "name": "Nome",
+    "type": "Tipo",
+    "description": "Descrição",
+    "notes": "Observações",
+    "closeNotification": "Fechar notificação",
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "clients": "Clientes",
+    "products": "Produtos",
+    "serviceOrders": "Ordens de Serviço",
+    "financial": "Financeiro"
+  },
+  "auth": {
+    "title": "Javos",
+    "subtitle": "Sistema de Gestão",
+    "username": "Usuário",
+    "password": "Senha",
+    "login": "Entrar",
+    "loggingIn": "Entrando...",
+    "usernamePlaceholder": "Digite seu usuário",
+    "passwordPlaceholder": "Digite sua senha",
+    "usernameRequired": "O campo usuário é obrigatório.",
+    "passwordRequired": "O campo senha é obrigatório."
+  },
+  "header": {
+    "logout": "Sair",
+    "tagline": "Sistema de Gestão"
+  },
+  "dashboard": {
+    "title": "Resumo do Sistema",
+    "totalUsers": "Total de Usuários",
+    "loggedUser": "Usuário Logado",
+    "version": "Versão",
+    "retry": "Tentar novamente"
+  },
+  "clients": {
+    "title": "Clientes",
+    "newClient": "+ Novo Cliente",
+    "searchPlaceholder": "Buscar por nome, e-mail ou documento…",
+    "nameRequired": "O nome é obrigatório.",
+    "created": "Cliente criado com sucesso.",
+    "updated": "Cliente atualizado com sucesso.",
+    "deleted": "Cliente \"{{name}}\" excluído com sucesso.",
+    "deleteConfirm": "Deseja excluir o cliente \"{{name}}\"? Esta ação não pode ser desfeita.",
+    "notFound": "Nenhum cliente encontrado.",
+    "editTitle": "Editar Cliente",
+    "createTitle": "Novo Cliente",
+    "fields": {
+      "name": "Nome *",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "document": "CPF / CNPJ",
+      "zipCode": "CEP",
+      "address": "Endereço",
+      "city": "Cidade",
+      "state": "UF",
+      "notes": "Observações",
+      "active": "Ativo"
+    },
+    "columns": {
+      "name": "Nome",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "document": "Documento",
+      "cityState": "Cidade / UF",
+      "status": "Status",
+      "actions": "Ações"
+    }
+  },
+  "products": {
+    "title": "Produtos",
+    "newProduct": "+ Novo Produto",
+    "searchPlaceholder": "Buscar por nome ou código…",
+    "nameRequired": "O nome é obrigatório.",
+    "priceRequired": "Informe um preço válido.",
+    "created": "Produto criado com sucesso.",
+    "updated": "Produto atualizado com sucesso.",
+    "deleted": "Produto \"{{name}}\" excluído com sucesso.",
+    "deleteConfirm": "Deseja excluir o produto \"{{name}}\"? Esta ação não pode ser desfeita.",
+    "notFound": "Nenhum produto encontrado.",
+    "editTitle": "Editar Produto",
+    "createTitle": "Novo Produto",
+    "types": {
+      "PRODUCT": "Produto",
+      "SERVICE": "Serviço"
+    },
+    "fields": {
+      "code": "Código",
+      "name": "Nome *",
+      "type": "Tipo *",
+      "description": "Descrição",
+      "price": "Preço (R$) *",
+      "cost": "Custo (R$)",
+      "stockQty": "Estoque",
+      "unit": "Unidade",
+      "active": "Ativo"
+    },
+    "columns": {
+      "code": "Código",
+      "name": "Nome",
+      "type": "Tipo",
+      "price": "Preço",
+      "stock": "Estoque",
+      "status": "Status",
+      "actions": "Ações"
+    }
+  },
+  "serviceOrders": {
+    "title": "Ordens de Serviço",
+    "newOrder": "+ Nova OS",
+    "searchPlaceholder": "Buscar por nº, cliente ou descrição…",
+    "clientRequired": "Selecione um cliente.",
+    "descriptionRequired": "A descrição é obrigatória.",
+    "created": "Ordem de serviço criada com sucesso.",
+    "updated": "Ordem de serviço atualizada com sucesso.",
+    "deleted": "OS \"{{id}}\" excluída com sucesso.",
+    "deleteConfirm": "Deseja excluir a OS \"{{id}}\"? Esta ação não pode ser desfeita.",
+    "notFound": "Nenhuma ordem de serviço encontrada.",
+    "editTitle": "Editar OS {{id}}",
+    "createTitle": "Nova Ordem de Serviço",
+    "selectClient": "Selecione um cliente…",
+    "status": {
+      "OPEN": "Aberta",
+      "IN_PROGRESS": "Em Andamento",
+      "WAITING_PARTS": "Aguardando Peças",
+      "DONE": "Concluída",
+      "CLOSED": "Fechada",
+      "CANCELLED": "Cancelada"
+    },
+    "priority": {
+      "LOW": "Baixa",
+      "NORMAL": "Normal",
+      "HIGH": "Alta",
+      "URGENT": "Urgente"
+    },
+    "fields": {
+      "client": "Cliente *",
+      "status": "Status",
+      "priority": "Prioridade",
+      "description": "Descrição *",
+      "diagnosis": "Diagnóstico",
+      "solution": "Solução",
+      "laborCost": "Mão de Obra (R$)",
+      "estimatedCompletion": "Previsão de Conclusão"
+    },
+    "columns": {
+      "orderNumber": "Nº OS",
+      "client": "Cliente",
+      "description": "Descrição",
+      "status": "Status",
+      "priority": "Prioridade",
+      "createdAt": "Criada em",
+      "actions": "Ações"
+    }
+  },
+  "financial": {
+    "title": "Financeiro",
+    "tabs": {
+      "charges": "Cobranças",
+      "accounts": "Contas",
+      "categories": "Categorias",
+      "entries": "Lançamentos"
+    },
+    "chargeStatus": {
+      "PENDING": "Pendente",
+      "SENT": "Enviada",
+      "PAID": "Paga",
+      "OVERDUE": "Vencida",
+      "CANCELLED": "Cancelada"
+    },
+    "chargeMethod": {
+      "BOLETO": "Boleto",
+      "PIX": "Pix",
+      "CREDIT_CARD": "Cartão de Crédito",
+      "BANK_TRANSFER": "Transferência",
+      "CASH": "Dinheiro"
+    },
+    "accountType": {
+      "CHECKING": "Conta Corrente",
+      "SAVINGS": "Poupança",
+      "CASH": "Caixa",
+      "CREDIT_CARD": "Cartão de Crédito"
+    },
+    "entryType": {
+      "INCOME": "Receita",
+      "EXPENSE": "Despesa"
+    },
+    "charges": {
+      "newCharge": "+ Nova Cobrança",
+      "notFound": "Nenhuma cobrança encontrada.",
+      "amountRequired": "Informe um valor válido.",
+      "created": "Cobrança criada com sucesso.",
+      "updated": "Cobrança atualizada com sucesso.",
+      "deleted": "Cobrança excluída com sucesso.",
+      "deleteConfirm": "Deseja excluir esta cobrança de {{amount}}? Esta ação não pode ser desfeita.",
+      "editTitle": "Editar Cobrança",
+      "createTitle": "Nova Cobrança",
+      "noClient": "Sem cliente",
+      "noMethod": "Não informado",
+      "fields": {
+        "client": "Cliente",
+        "amount": "Valor (R$) *",
+        "dueDate": "Vencimento",
+        "status": "Status",
+        "method": "Método",
+        "notes": "Observações"
+      },
+      "columns": {
+        "client": "Cliente",
+        "amount": "Valor",
+        "dueDate": "Vencimento",
+        "status": "Status",
+        "method": "Método",
+        "actions": "Ações"
+      }
+    },
+    "accounts": {
+      "newAccount": "+ Nova Conta",
+      "notFound": "Nenhuma conta encontrada.",
+      "nameRequired": "O nome é obrigatório.",
+      "created": "Conta criada com sucesso.",
+      "updated": "Conta atualizada com sucesso.",
+      "deleted": "Conta \"{{name}}\" excluída com sucesso.",
+      "deleteConfirm": "Deseja excluir a conta \"{{name}}\"? Esta ação não pode ser desfeita.",
+      "editTitle": "Editar Conta",
+      "createTitle": "Nova Conta",
+      "fields": {
+        "name": "Nome *",
+        "type": "Tipo *",
+        "balance": "Saldo (R$)",
+        "active": "Ativa"
+      },
+      "columns": {
+        "name": "Nome",
+        "type": "Tipo",
+        "balance": "Saldo",
+        "status": "Status",
+        "actions": "Ações"
+      }
+    },
+    "categories": {
+      "newCategory": "+ Nova Categoria",
+      "notFound": "Nenhuma categoria encontrada.",
+      "nameRequired": "O nome é obrigatório.",
+      "created": "Categoria criada com sucesso.",
+      "updated": "Categoria atualizada com sucesso.",
+      "deleted": "Categoria \"{{name}}\" excluída com sucesso.",
+      "deleteConfirm": "Deseja excluir a categoria \"{{name}}\"? Esta ação não pode ser desfeita.",
+      "editTitle": "Editar Categoria",
+      "createTitle": "Nova Categoria",
+      "fields": {
+        "name": "Nome *",
+        "type": "Tipo *",
+        "description": "Descrição",
+        "active": "Ativa"
+      },
+      "columns": {
+        "name": "Nome",
+        "type": "Tipo",
+        "description": "Descrição",
+        "status": "Status",
+        "actions": "Ações"
+      }
+    },
+    "entries": {
+      "newEntry": "+ Novo Lançamento",
+      "notFound": "Nenhum lançamento encontrado.",
+      "descriptionRequired": "A descrição é obrigatória.",
+      "amountRequired": "Informe um valor válido.",
+      "created": "Lançamento criado com sucesso.",
+      "updated": "Lançamento atualizado com sucesso.",
+      "deleted": "Lançamento \"{{description}}\" excluído com sucesso.",
+      "deleteConfirm": "Deseja excluir o lançamento \"{{description}}\"? Esta ação não pode ser desfeita.",
+      "editTitle": "Editar Lançamento",
+      "createTitle": "Novo Lançamento",
+      "paid": "Pago",
+      "fields": {
+        "description": "Descrição *",
+        "amount": "Valor (R$) *",
+        "type": "Tipo *",
+        "dueDate": "Vencimento",
+        "paymentDate": "Data de Pagamento",
+        "category": "Categoria",
+        "account": "Conta",
+        "notes": "Observações",
+        "paid": "Pago",
+        "noCategory": "Sem categoria",
+        "noAccount": "Sem conta"
+      },
+      "columns": {
+        "description": "Descrição",
+        "type": "Tipo",
+        "amount": "Valor",
+        "dueDate": "Vencimento",
+        "paid": "Pago",
+        "category": "Categoria",
+        "account": "Conta",
+        "actions": "Ações"
+      }
+    }
+  },
+  "language": {
+    "label": "Idioma",
+    "pt-BR": "Português",
+    "en": "English",
+    "es": "Español"
+  }
+}
